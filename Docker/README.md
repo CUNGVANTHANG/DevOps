@@ -2,6 +2,14 @@
 
 ## Mục lục
 
+
+
+<details>
+  <summary>Cách Docker hoạt động</summary>
+
+- [1. Kiến trúc Docker](#1-kiến-trúc-docker)
+- [2. Các thành phần cơ bản của Docker](#2-các-thành-phần-cơ-bản-của-docker)
+
 <details>
   <summary>Danh sách lệnh</summary>
 
@@ -10,9 +18,30 @@
 | 1 | `docker ps` | Liệt kê các container đang chạy |
 | 2 | `docker pull` | Pull (download) một docker image |
 | 3 | `docker version` | Show version của Docker client, Docker host |
-| 4 | `docker info` | Show ra các thông tin của docker client và docker host |
+| 4 | [`docker info`](#docker-info) | Show ra các thông tin của docker client và docker host |
 | 5 | [`whereis`](#whereis) | Tìm location nơi chứa file binary của chương trình |
   
+</details>
+</details>
+
+<details>
+  <summary>Docker container</summary>
+
+- [1. Cấu trúc lệnh](#1-cấu-trúc-lệnh)
+- [2. Image vs Container](#2-image-vs-container)
+
+<details>
+  <summary>Danh sách lệnh</summary>
+
+| STT | Lệnh | Tác dụng |
+| :--: | :--: | :--: |
+| 1 | [`docker container run`](#docker-container-run) | Tạo docker container | 
+| 2 | `docker container logs [name_container]` | Log container |
+| 3 | `docker container exec -it [name_container] bash` | Truy cập vào container sử dụng câu lệnh giống Ubuntu |
+| 4 | `docker container --help` | Xem hướng dẫn các câu lệnh container |
+| 5 | `docker container stats [name_container]` | Xem các thông số trong container |
+  
+</details>
 </details>
 
 ## I. Cách Docker hoạt động
@@ -128,5 +157,27 @@ _Chú ý:_
 <img src="https://github.com/user-attachments/assets/89ba96de-ea0a-4762-8ed3-45dae56e2375" width="300px">
 
 <img src="https://github.com/user-attachments/assets/a30f9a3b-0d72-4bdc-9843-2b2ae9743fb1" width="300px">
+
+### 3. Container vs Virtual Machine
+[:arrow_up: Mục lục](#mục-lục)
+
+Virtual Machine là công nghệ ảo hóa ở mức độ sâu hơn: ảo hóa cả phần cứng
+
+Một VM tương đương với một server hoàn chỉnh: có phần cứng riêng, OS riêng, application riêng
+
+| Ưu điểm | Nhược điểm |
+| :--: | :--: |
+| Môi trường độc lập cao | Ngốn nhiều tài nguyên |
+| Tính bảo mật tốt hơn | Chậm chạp |
+
+-> Phù hợp để dựng môi trường hoàn chỉnh để triển khai / test application
+
+### 4. Bài tập
+[:arrow_up: Mục lục](#mục-lục)
+
+- Tạo docker container cho các ứng dụng: nginx, mysql, wordpress
+- Nginx web server: chạy cổng 81:80
+- Mysql database: chạy cổng 3306, password là "password123_DONG", database là "db_example"
+- Wordpress website: chạy cổng 8080, kết nối database ở bên trên
 
 
