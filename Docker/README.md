@@ -40,6 +40,8 @@
 | 3 | `docker container exec -it [name_container] bash` | Truy cập vào container sử dụng câu lệnh giống Ubuntu |
 | 4 | `docker container --help` | Xem hướng dẫn các câu lệnh container |
 | 5 | `docker container stats [name_container]` | Xem các thông số trong container |
+| 6 | `docker container inspect [name_container] | Xem thông tin chi tiết của container |
+| 7 | [`netstat -plunt`](#netstat--plunt) | Xem trạng thái của các port (cổng) trên hệ thống |
   
 </details>
 </details>
@@ -154,9 +156,23 @@ _Chú ý:_
 - 80:80 : bên trái là port của host, bên phải là port của container
 - nginx: khi không có tag, mặc định sẽ là **latest**
 
+_Kết quả:_
+
 <img src="https://github.com/user-attachments/assets/89ba96de-ea0a-4762-8ed3-45dae56e2375" width="300px">
 
 <img src="https://github.com/user-attachments/assets/a30f9a3b-0d72-4bdc-9843-2b2ae9743fb1" width="300px">
+
+### netstat -plunt
+
+Dùng để xem trạng thái của các port (cổng) trên hệ thống
+
+<img src="https://github.com/user-attachments/assets/380973c5-99f7-4641-b88e-778e87f10054" width="400px">
+
+_Cài đặt:_
+
+```
+sudo apt install net-tools
+```
 
 ### 3. Container vs Virtual Machine
 [:arrow_up: Mục lục](#mục-lục)
@@ -170,14 +186,78 @@ Một VM tương đương với một server hoàn chỉnh: có phần cứng ri
 | Môi trường độc lập cao | Ngốn nhiều tài nguyên |
 | Tính bảo mật tốt hơn | Chậm chạp |
 
--> Phù hợp để dựng môi trường hoàn chỉnh để triển khai / test application
+--> Phù hợp để dựng môi trường hoàn chỉnh để triển khai / test application
 
 ### 4. Bài tập
 [:arrow_up: Mục lục](#mục-lục)
 
 - Tạo docker container cho các ứng dụng: nginx, mysql, wordpress
 - Nginx web server: chạy cổng 81:80
-- Mysql database: chạy cổng 3306, password là "password123_DONG", database là "db_example"
+- Mysql database: chạy cổng 3307, password là "password123_DONG", database là "db_example"
 - Wordpress website: chạy cổng 8080, kết nối database ở bên trên
 
+**Lời giải**
+
+- **Tạo docker container cho các ứng dụng: nginx, mysql, wordpress**
+- **Nginx web server: chạy cổng 81:80**
+
+```
+docker container run --name my-nginx -p 81:80 -d nginx
+```
+
+_Kết quả:_
+
+<img src="https://github.com/user-attachments/assets/7e1ac87c-9bfb-4e2e-9841-9c83bab96b61" width="300px">
+
+Kiểm tra bằng `docker container logs my-nginx` để biết rõ hơn
+
+- **Mysql database: chạy cổng 3307, password là "password123_DONG", database là "db_example"**
+
+Tham khảo tại: https://hub.docker.com/_/mysql
+
+```
+docker container run --name my-mysql -p 3307:3306 -e MYSQL_ROOT_PASSWORD=password123_DONG -e MYSQL_DATABASE=db_example -d mysql:latest
+```
+
+trong đó `-e` nghĩa là sử dụng biến có sẵn `MYSQL_ROOT_PASSWORD` và `MYSQL_DATABASE`
+
+Để kiểm tra xem đã thành công chưa chúng ta sử dụng 
+
+```
+docker container exec -it my-mysql bash
+```
+
+Sau đó sử dụng câu lệnh sau và nhập password là `password123_DONG`
+
+```
+mysql -u root -p
+```
+
+_Kết quả:_
+
+<img src="https://github.com/user-attachments/assets/97ce5af5-3a8a-4db3-b5b2-3a4e125faf9d" width="500px">
+
+- **Wordpress website: chạy cổng 8080, kết nối database ở bên trên**
+
+```
+docker container run --name my-wordpress -p 8080:80 -d wordpress
+```
+
+_Kết quả:_
+
+<img src="https://github.com/user-attachments/assets/afb1c834-4fc0-4051-b980-93ae7a4c086d" width="400px">
+
+<img src="https://github.com/user-attachments/assets/e25cc482-5d39-4037-99fe-06cf6f12dbed" width="400px">
+
+Sau đó ta thực hiện kết nối với database. 
+
+<img src="https://github.com/user-attachments/assets/8f3164f5-b0a5-4d8b-aa66-3cb98817758f" width="400px">
+
+Lưu ý rằng **Database Host** ta sẽ lấy địa chỉ IP của mysql, bằng cách thực hiện
+
+```
+docker container inspect my-mysql
+```
+
+<img src="https://github.com/user-attachments/assets/ee00f98c-6842-42b4-bf44-e5a9030e49a8" width="400px">
 
