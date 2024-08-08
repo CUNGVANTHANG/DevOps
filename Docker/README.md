@@ -239,19 +239,21 @@ _Kết quả:_
 
 - **Wordpress website: chạy cổng 8080, kết nối database ở bên trên**
 
+Tham khảo tại đây: https://hub.docker.com/_/wordpress
+
 ```
 docker container run --name my-wordpress -p 8080:80 -d wordpress
 ```
 
 _Kết quả:_
 
-<img src="https://github.com/user-attachments/assets/afb1c834-4fc0-4051-b980-93ae7a4c086d" width="400px">
+<img src="https://github.com/user-attachments/assets/afb1c834-4fc0-4051-b980-93ae7a4c086d" width="600px">
 
-<img src="https://github.com/user-attachments/assets/e25cc482-5d39-4037-99fe-06cf6f12dbed" width="400px">
+<img src="https://github.com/user-attachments/assets/e25cc482-5d39-4037-99fe-06cf6f12dbed" width="600px">
 
 Sau đó ta thực hiện kết nối với database. 
 
-<img src="https://github.com/user-attachments/assets/8f3164f5-b0a5-4d8b-aa66-3cb98817758f" width="400px">
+<img src="https://github.com/user-attachments/assets/3ffe7188-29ff-41b7-9a9d-65e3b05170ff" width="400px">
 
 Lưu ý rằng **Database Host** ta sẽ lấy địa chỉ IP của mysql, bằng cách thực hiện
 
