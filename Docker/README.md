@@ -1,8 +1,5 @@
 ## Docker
-
 ## Mục lục
-
-
 
 <details>
   <summary>Cách Docker hoạt động</summary>
@@ -29,6 +26,8 @@
 
 - [1. Cấu trúc lệnh](#1-cấu-trúc-lệnh)
 - [2. Image vs Container](#2-image-vs-container)
+- [3. Container vs Virtual Machine](#3-container-vs-virtual-machine)
+- [4. Bài tập](#4-bài-tập)
 
 <details>
   <summary>Danh sách lệnh</summary>
@@ -43,6 +42,21 @@
 | 6 | `docker container inspect [name_container] | Xem thông tin chi tiết của container |
 | 7 | [`netstat -plunt`](#netstat--plunt) | Xem trạng thái của các port (cổng) trên hệ thống |
   
+</details>
+</details>
+
+<details>
+  <summary>Docker container</summary>
+
+- [1. Docker image là gì](#1-docker-image-là-gì)
+
+<details>
+  <summary>Danh sách lệnh</summary>
+
+| STT | Lệnh | Tác dụng |
+| :--: | :--: | :--: |
+| 1 | [`docker image ls`](#docker-image-ls) | Liệt kê các image và dung lượng của nó | 
+
 </details>
 </details>
 
@@ -128,7 +142,7 @@ Docker image là file template tạo ra container
 
 Container là môi trường ảo hóa độc lập, hoàn chỉnh: chứa chương trình và các gói bổ sung
 
-Container bản chất là một process trên hệ thống
+Container **bản chất là một process** trên hệ thống
 
 ![image](https://github.com/user-attachments/assets/0906e10a-a4e2-484a-bd48-26c60047f8e4)
 
@@ -262,4 +276,36 @@ docker container inspect my-mysql
 ```
 
 <img src="https://github.com/user-attachments/assets/ee00f98c-6842-42b4-bf44-e5a9030e49a8" width="400px">
+
+## III. Docker image
+[:arrow_up: Mục lục](#mục-lục)
+
+### 1. Docker image là gì
+[:arrow_up: Mục lục](#mục-lục)
+
+Container là một process, vậy để phân phối được container đến nhiều máy tính khác nhau chúng ta cần tới docker image 
+
+Docker image là:
+
+- Là file app binaries + các dependencies
+- Là template dùng để tạo ra các container
+- Image không chứa OS đầy đủ. Không có kernel vì nó dùng kernel của máy host (VD: driver...)
+- Có thể chỉ là 1 file có dung lượng khá nhỏ (VD alpine, busybox...)
+- Hoặc 1 file có dung lượng lớn (VD: mongodb, mysql, wordpress...)
+
+### docker image ls
+
+Liệt kê các image và dung lượng của nó
+
+<img src="https://github.com/user-attachments/assets/08f088d9-f89b-4e3b-975e-784c2d40ba87" width="400px">
+
+_Ví dụ:_ Về docker image
+
+<img src="https://github.com/user-attachments/assets/90b017fe-e35b-40d4-9d91-74a6952efce7" width="300px">
+
+File microsoft word khi cài đặt trên máy sẽ ngốn 1.5GB trên ổ cứng của ta. Khi mà ta sử dụng chương trình microsoft word để soạn thảo văn bản thì nó sẽ ngốn 1 lượng tài nguyên khác của chương trình là CPU và RAM
+
+<img src="https://github.com/user-attachments/assets/8767c162-e144-4854-bc2e-ddf4484f676e" width="300px">
+
+Tương tự docker image giống như file microsoft word chiếm 1 dung lượng nhất định. Khi mà docker tạo docker container từ docker image thì nó sẽ ngốn CPU và RAM (vì nó là file template nên nó có thể tạo ra nhiều docker container nhưng vẫn sẽ chạy độc lập trên máy host)
 
