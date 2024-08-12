@@ -320,6 +320,49 @@ Tương tự docker image giống như file microsoft word chiếm 1 dung lượ
 >- Dockerfile: Tạo docker image từ các instruction trong Dockerfile
 >- Docker container
 
+#### Cấu trúc của Docker Image
+
+Image tạo bởi 1 chuỗi layers. Mỗi layer là một sự thay đổi trên file system
+
+**File system?**
+
+- Là cách mà non-volatile data được lưu trữ, quản lý trên các storage devices
+  - VD: FAT, NTFS, ext...
+
+> [!NOTE]
+> - **non-volatile data** là dữ liệu không bị mất đi khi ngắt nguồn điện
+> - **volatile data** là dữ liệu lưu trên RAM, cache sẽ bị mất khi ngắt nguồn điện
+
+Docker sử dụng file khá là đặc biệt đó là union file system
+
+**Union File System?**
+
+- Các layer xếp chồng lên nhau theo trình tự từ dưới lên trên
+- Layer bên trên sẽ kế thừa layer bên dưới
+- Tất cả layer trong image đều là read-only
+
+Tương tự như vậy
+
+```
+FROM node:18-alpine            -> Base image
+WORKDIR /app                   -> Layer 1
+COPY . .                       -> Layer 2
+RUN yarn install --production  -> Layer 3
+CMD ["node", "src/index.js"    -> Layer 4
+EXPOSE 3000                    -> Layer 5
+```
+
+Câu lệnh sử dụng để xem được các layer của docker image
+
+### docker image history
+
+_Ví dụ:_
+
+```
+docker image history redis:latest
+```
+
+
 ### 2. Tạo Redis container từ DockerHub
 [:arrow_up: Mục lục](#mục-lục)
 
@@ -364,3 +407,5 @@ RUN yarn install --production  -> Chạy command bên trong container
 CMD ["node", "src/index.js"    -> Lệnh/chương trình được chạy khi container start
 EXPOSE 3000                    -> Mở cổng trên container
 ```
+
+Tham khảo thêm tại: https://docs.docker.com/reference/dockerfile/
