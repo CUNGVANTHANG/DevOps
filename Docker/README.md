@@ -46,9 +46,10 @@
 </details>
 
 <details>
-  <summary>Docker container</summary>
+  <summary>Docker image</summary>
 
 - [1. Docker image là gì](#1-docker-image-là-gì)
+- [2. Tạo Redis container từ DockerHub](#2-tạo-redis-container-từ-dockerhub)
 
 <details>
   <summary>Danh sách lệnh</summary>
@@ -56,6 +57,8 @@
 | STT | Lệnh | Tác dụng |
 | :--: | :--: | :--: |
 | 1 | [`docker image ls`](#docker-image-ls) | Liệt kê các image và dung lượng của nó | 
+| 2 | docker network create [name_network] |  tạo môi trường để các container giao tiếp với nhau thông qua container name | 
+
 
 </details>
 </details>
@@ -164,11 +167,10 @@ Hoạt động như sau:
 5. Mở port 80 trên máy host và bind nó với port 80 của container
 6. Chạy chương trình chính bên trong container
 
-_Chú ý:_
-
-- `--publish` là tên đầy đủ của `-p` option
-- 80:80 : bên trái là port của host, bên phải là port của container
-- nginx: khi không có tag, mặc định sẽ là **latest**
+> [!NOTE]
+> - `--publish` là tên đầy đủ của `-p` option
+> - 80:80 : bên trái là port của host, bên phải là port của container
+> - nginx: khi không có tag, mặc định sẽ là **latest**
 
 _Kết quả:_
 
@@ -200,11 +202,14 @@ Một VM tương đương với một server hoàn chỉnh: có phần cứng ri
 | Môi trường độc lập cao | Ngốn nhiều tài nguyên |
 | Tính bảo mật tốt hơn | Chậm chạp |
 
---> Phù hợp để dựng môi trường hoàn chỉnh để triển khai / test application
+> [!NOTE]
+> Phù hợp để dựng môi trường hoàn chỉnh để triển khai / test application
+
 
 ### 4. Bài tập
 [:arrow_up: Mục lục](#mục-lục)
 
+- Tạo docker container cho các ứng dụng: nginx, mysql, wordpress
 - Tạo docker container cho các ứng dụng: nginx, mysql, wordpress
 - Nginx web server: chạy cổng 81:80
 - Mysql database: chạy cổng 3307, password là "password123_DONG", database là "db_example"
@@ -309,3 +314,53 @@ File microsoft word khi cài đặt trên máy sẽ ngốn 1.5GB trên ổ cứn
 
 Tương tự docker image giống như file microsoft word chiếm 1 dung lượng nhất định. Khi mà docker tạo docker container từ docker image thì nó sẽ ngốn CPU và RAM (vì nó là file template nên nó có thể tạo ra nhiều docker container nhưng vẫn sẽ chạy độc lập trên máy host)
 
+> [!IMPORTANT]
+> **3 cách để có Docker image**
+>- DockerHub: Download docker image từ public registry
+>- Dockerfile: Tạo docker image từ các instruction trong Dockerfile
+>- Docker container
+
+### 2. Tạo Redis container từ DockerHub
+[:arrow_up: Mục lục](#mục-lục)
+
+Trước khi tạo docker container ta sẽ tạo docker network trước. Docker network là môi trường để các container giao tiếp với nhau thông qua container name. Ví dụ
+
+```
+docker network create test
+```
+
+Tiếp theo ta khởi tạo docker tên là `some-redis` bằng cách
+
+```
+docker run --name some-redis -d --network test redis
+```
+
+Cần client để gửi dữ liệu, ta cài đặt
+
+```
+docker run -it --network test --rm redis redis-cli -h some-redis
+```
+
+Để có thể kiểm tra ta đã có thể truy cập chưa, sử dụng câu lệnh `ping` để kiểm tra
+
+### 3. Dockerfile
+[:arrow_up: Mục lục](#mục-lục)
+
+- Là bản thiết kế tạo ra Docker image
+- Chứa các chỉ dẫn (intructions) cho docker daemon
+- Một Dockerfile phải bắt đầu với chỉ dẫn "FROM"
+
+_Ví dụ:_
+
+<img src="https://github.com/user-attachments/assets/fd1e78f5-83fb-4757-88fb-d988bd9761a0" width="300px" >
+
+_Giải thích lệnh:_
+
+```
+FROM node:18-alpine            -> Base image
+WORKDIR /app                   -> Thư mục chính
+COPY . .                       -> Copy thư mục hiện tại vào thư mục chính của container
+RUN yarn install --production  -> Chạy command bên trong container
+CMD ["node", "src/index.js"    -> Lệnh/chương trình được chạy khi container start
+EXPOSE 3000                    -> Mở cổng trên container
+```
