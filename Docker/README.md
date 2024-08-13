@@ -67,6 +67,7 @@
 | 4 | [docker image build](#docker-image-build) | Build dockerfile |
 | 5 | [docker container commit](#docker-container-commit) | Tạo docker image từ docker container |
 | 6 | [docker image tag](#docker-image-tag) | Thay đổi tên, tag của một docker image | 
+| 7 | [docker image push [name_account/image] | Push image lên docker hub | 
 
 </details>
 </details>
@@ -614,7 +615,19 @@ docker container commit my-container new-image
 ### 4. Phân phối, chia sẻ Docker image bằng Docker registry
 [:arrow_up: Mục lục](#mục-lục)
 
-Để có thể làm điều đó ta sẽ dùng lệnh pull/push phân phối images lên Docker registry
+Để có thể làm điều đó ta sẽ dùng lệnh pull/push phân phối images lên Docker registry. Ta cần đăng nhập vào 
+https://hub.docker.com/, hoặc sử dụng Docker Desktop để đăng nhập
+
+<img src="https://github.com/user-attachments/assets/c7de7d35-4bf6-43d6-9d1c-5209786ee4b7" width="500px" >
+
+Sau đó sử dụng câu lệnh sau để đăng nhập
+
+```
+docker login
+```
+
+- [!NOTE]
+- **Trước khi đẩy image của chúng ta lên docker hub, ta cần đổi tên image:tag thành [account_name]/image:tag**
 
 ### docker image tag
 [:arrow_up: Mục lục](#mục-lục)
@@ -626,4 +639,31 @@ Cú pháp:
 ```
 docker image tag <source>:<tag> <target>:<tag>
 ```
+
+_Ví dụ:_
+
+<img src="https://github.com/user-attachments/assets/54086f13-e08d-4658-815e-f8304be9c4d1" width="300px" >
+
+Ta sử dụng `docker image tag` trong đó `cungvanthang` chính là tên account của ta
+
+```
+docker image tag redis:latest cungvanthang/redis:latest
+```
+
+<img src="https://github.com/user-attachments/assets/5659488c-4197-4276-880f-50421c97fd90" width="300px" >
+
+Tiếp theo ta sử dụng câu lệnh `docker image push`
+
+```
+docker image push cungvanthang/redis
+```
+
+<img src="https://github.com/user-attachments/assets/4f3581f2-2d66-4a1c-a9b3-9506e2166406" width="300px" >
+
+_Kết quả:_
+
+<img src="https://github.com/user-attachments/assets/20269c89-6c4c-4081-b34a-c231c7524974" width="300px" >
+
+
+
 
