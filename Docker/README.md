@@ -44,7 +44,8 @@
 | 5 | `docker container stats [name_container]` | Xem các thông số trong container |
 | 6 | `docker container inspect [name_container] | Xem thông tin chi tiết của container |
 | 7 | `docker container diff [name_container]` | Xem các writable layer trong container |
-| 8 | [`netstat -plunt`](#netstat--plunt) | Xem trạng thái của các port (cổng) trên hệ thống |
+| 8 | `docker container prune` | Xóa tất cả các container ở trạng thái Stopped |
+| 9 | [`netstat -plunt`](#netstat--plunt) | Xem trạng thái của các port (cổng) trên hệ thống |
   
 </details>
 </details>
@@ -53,8 +54,10 @@
   <summary>Docker image</summary>
 
 - [1. Docker image là gì](#1-docker-image-là-gì)
-- [2. Dockerfile](#3-dockerfile)
+- [2. Dockerfile](#2-dockerfile)
 - [3. Tạo Docker image từ Docker container](#3-tạo-docker-image-từ-docker-container)
+- [4. Phân phối, chia sẻ Docker image bằng Docker registry](#4-phân-phối-chia-sẻ-docker-image-bằng-docker-registry)
+- [5. Phân phối, chia sẻ Docker image bằng file TAR](#5-phân-phối-chia-sẻ-docker-image-bằng-file-tar)
 
 <details>
   <summary>Danh sách lệnh</summary>
@@ -62,12 +65,14 @@
 | STT | Lệnh | Tác dụng |
 | :--: | :--: | :--: |
 | 1 | [`docker image ls`](#docker-image-ls) | Liệt kê các image và dung lượng của nó | 
-| 2 | docker network create [name_network] |  Tạo môi trường để các container giao tiếp với nhau thông qua container name | 
-| 3 | [docker image history](#docker-image-history) |Xem các layer của docker image |
-| 4 | [docker image build](#docker-image-build) | Build dockerfile |
-| 5 | [docker container commit](#docker-container-commit) | Tạo docker image từ docker container |
-| 6 | [docker image tag](#docker-image-tag) | Thay đổi tên, tag của một docker image | 
-| 7 | [docker image push [name_account/image] | Push image lên docker hub | 
+| 2 | `docker network create [name_network]` |  Tạo môi trường để các container giao tiếp với nhau thông qua container name | 
+| 3 | [`docker image history`](#docker-image-history) |Xem các layer của docker image |
+| 4 | [`docker image build`](#docker-image-build) | Build dockerfile |
+| 5 | [`docker container commit`](#docker-container-commit) | Tạo docker image từ docker container |
+| 6 | [`docker image tag`](#docker-image-tag) | Thay đổi tên, tag của một docker image | 
+| 7 | `docker image push [image or account/image]` | Push image lên docker hub | 
+| 8 | `docker image rm [image or account/image]:[tag]` | Xóa image tại local | 
+| 9 | `docker image pull [image or account/image]` | Pull image từ docker hub | 
 
 </details>
 </details>
@@ -356,7 +361,7 @@ Docker image là:
 > [!IMPORTANT]
 > **2 cách để phân phối, chia sẻ Docker image cho người khác**
 >- Docker Registry: Dùng lệnh pull/push phân phối images lên Docker registry
->- TAR file: 
+>- TAR file: Chuyển image thành file TAR
 
 ### docker image ls
 [:arrow_up: Mục lục](#mục-lục)
@@ -664,6 +669,47 @@ _Kết quả:_
 
 <img src="https://github.com/user-attachments/assets/20269c89-6c4c-4081-b34a-c231c7524974" width="300px" >
 
+### 5. Phân phối, chia sẻ Docker image bằng file TAR
+[:arrow_up: Mục lục](#mục-lục)
 
+Để có thể làm điều đó ta sẽ convert image thành file TAR
+
+### docker image save
+[:arrow_up: Mục lục](#mục-lục)
+
+Cú pháp:
+
+```
+docker image save [image or name_account/image] -o file.taz
+```
+
+_Ví dụ:_ Trong đó `redis` là tên image, `redis.taz` là tên file ta muốn đặt tên
+
+```
+docker image save redis -o redis.taz
+```
+
+<img src="https://github.com/user-attachments/assets/0b5ab84b-dc99-46f0-b13a-36f24dbc67c8" width="500px" >
+
+Ta có thể thấy được file `redis.taz` đã được convert từ image. Bây giờ chúng ta có thể gửi file này cho bạn bè hoặc người khác
+
+Dĩ nhiên, bạn bè hoặc người khác để có thể load được file `redis.taz` đó thì sẽ sử dụng câu lệnh sau:
+
+### docker image load
+[:arrow_up: Mục lục](#mục-lục)
+
+Cú pháp:
+
+```
+docker image load -i [name_file.taz]
+```
+
+_Ví dụ:_ Trong đó `redis.taz` chính là file `.taz` ta muốn load
+
+```
+docker load -i redis.taz 
+```
+
+<img src="https://github.com/user-attachments/assets/d6cd10e3-154d-40b5-9b76-a438f974aefd" width="500px" >
 
 
