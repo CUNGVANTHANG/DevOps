@@ -354,6 +354,7 @@ EXPOSE 3000                    -> Layer 5
 ```
 
 ### docker image history
+[:arrow_up: Mục lục](#mục-lục)
 
 Câu lệnh sử dụng để xem được các layer của docker image
 
@@ -368,24 +369,6 @@ _Kết quả:_
 <img src="https://github.com/user-attachments/assets/c264c13f-926d-48c4-91ca-876845b9e4ac" width="500px" >
 
 Nếu ta cộng tất cả kích thước ở đây sẽ ra được kích thước thật của docker image
-
-**Cached layers**
-
-Docker cố gắng sử dụng lại các layer đã tạo trước đó
-
-Và build lại toàn bộ từ layer đầu tiên bị thay đổi
-
-_Ví dụ:_
-
-<img src="https://github.com/user-attachments/assets/fd1e78f5-83fb-4757-88fb-d988bd9761a0" width="300px" >
-
-Hiểu đơn giản nếu layer 3 có sự thay đổi thì các layer ở phía trên sẽ được caching lại nghĩa là không cần phải tạo mới mà được sử dụng luôn. Nó sẽ build từ layer 3 xuống các layer dưới
-
-**Kỹ thuật tối ưu hóa quá trình build**
-
-Chuyển những instruction dùng chung cho mọi lần build (VD update OS, cài đặt chương trình...) lên trước để tận dụng khả năng cache của Docker
-
-Dùng small base image
 
 ### 2. Tạo Redis container từ DockerHub
 [:arrow_up: Mục lục](#mục-lục)
@@ -434,10 +417,78 @@ EXPOSE 3000                    -> Mở cổng trên container
 
 Tham khảo thêm tại: https://docs.docker.com/reference/dockerfile/
 
-### docker image build
+**Cached layers**
 
-_Ví dụ:_ Build dockerfile có tên là `Dockerfile` ta thực hiện câu lệnh sau. Trong đó `demo` là tên file, `.` nghĩa là build tại vị trí hiện tại
+Docker cố gắng sử dụng lại các layer đã tạo trước đó
+
+Và build lại toàn bộ từ layer đầu tiên bị thay đổi
+
+_Ví dụ:_
+
+<img src="https://github.com/user-attachments/assets/fd1e78f5-83fb-4757-88fb-d988bd9761a0" width="300px" >
+
+Hiểu đơn giản nếu layer 3 có sự thay đổi thì các layer ở phía trên sẽ được caching lại nghĩa là không cần phải tạo mới mà được sử dụng luôn. Nó sẽ build từ layer 3 xuống các layer dưới
+
+**Kỹ thuật tối ưu hóa quá trình build**
+
+Tại sao phải tối ưu hóa quá trình build. Đơn giản là để đỡ mất thời gian
+
+**Cách 1**: Chuyển những instruction dùng chung cho mọi lần build (VD update OS, cài đặt chương trình...) lên trước để tận dụng khả năng cache của Docker
+
+### docker image build
+[:arrow_up: Mục lục](#mục-lục)
+
+_Ví dụ:_ Build dockerfile có tên là `Dockerfile` ta thực hiện câu lệnh sau. Dấu `.` nghĩa là build tại vị trí hiện tại là thư mục demo
+
+Cấu trúc thư mục:
+
+```
+demo
+├── demo
+└── Dockerfile
+```
+
+File `Dockerfile`:
+
+```dockerfile
+FROM ubuntu:latest
+RUN apt update -y && apt update -y
+COPY . .
+CMD ["tail", "-f", "/dev/null"]
+```
+
+Thực hiện câu lệnh để build docker image:
 
 ```
 docker image build -t demo -f Dockerfile .
 ```
+
+Sau khi hoàn thành ta có thể thực hiện 
+
+```
+docker container run --name demo -it demo bash
+```
+
+Xong đó sử dụng câu lệnh `ls` để xem kết quả. Tất cả file trong thư mục demo đều có trong container
+
+Nếu file `demo` bị thay đổi thì chỉ chạy lại layer tại `COPY . .` xuống các layer phía dưới tránh được mất thời gian build lại từ đầu
+
+**Cách 2**: Dùng small base image
+
+**Cách 3**: Dùng `.dockerignore` file
+
+_Ví dụ:_ Ta có cấu trúc thư mục sau
+
+```
+demo
+├── useless_folder
+├── Dockerfile
+└── .dockerignore
+```
+
+Bây giờ ta muốn bỏ qua thư mục `useless_folder` trong quá trình build ta làm như sau:
+
+```dockerignore
+/useless_folder
+```
+
