@@ -561,10 +561,13 @@ Thì cách hoạt động là state 1 sẽ là input cho state 2 đóng gói th�
 ### 4. Tạo container từ image
 [:arrow_up: Mục lục](#mục-lục)
 
+Cách tạo rất đơn giản là tạo thêm layer mới lên trên layer của docker image (Docker thêm 1 writable layer lên trên các image layers)
 
+Hình dung là image layers là các layer read-only. Để có thể tạo container từ image ta chỉ cần thêm writable layer lên trên 
 
+<img src="https://github.com/user-attachments/assets/25064556-e4ad-4137-899f-f6b37a9044f9" width="300px" >
 
-
+<img src="https://github.com/user-attachments/assets/7073bffc-aa09-45f7-a865-375fc66baa97" width="300px" >
 
 
 
