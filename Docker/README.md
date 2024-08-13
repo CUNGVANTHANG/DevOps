@@ -57,8 +57,9 @@
 | STT | Lệnh | Tác dụng |
 | :--: | :--: | :--: |
 | 1 | [`docker image ls`](#docker-image-ls) | Liệt kê các image và dung lượng của nó | 
-| 2 | docker network create [name_network] |  tạo môi trường để các container giao tiếp với nhau thông qua container name | 
-
+| 2 | docker network create [name_network] |  Tạo môi trường để các container giao tiếp với nhau thông qua container name | 
+| 3 | [docker image history](#docker-image-history) |Xem các layer của docker image |
+| 4 | [docker image build](#docker-image-build) | Build dockerfile |
 
 </details>
 </details>
@@ -352,9 +353,9 @@ CMD ["node", "src/index.js"    -> Layer 4
 EXPOSE 3000                    -> Layer 5
 ```
 
-Câu lệnh sử dụng để xem được các layer của docker image
-
 ### docker image history
+
+Câu lệnh sử dụng để xem được các layer của docker image
 
 _Ví dụ:_
 
@@ -362,6 +363,29 @@ _Ví dụ:_
 docker image history redis:latest
 ```
 
+_Kết quả:_
+
+<img src="https://github.com/user-attachments/assets/c264c13f-926d-48c4-91ca-876845b9e4ac" width="500px" >
+
+Nếu ta cộng tất cả kích thước ở đây sẽ ra được kích thước thật của docker image
+
+**Cached layers**
+
+Docker cố gắng sử dụng lại các layer đã tạo trước đó
+
+Và build lại toàn bộ từ layer đầu tiên bị thay đổi
+
+_Ví dụ:_
+
+<img src="https://github.com/user-attachments/assets/fd1e78f5-83fb-4757-88fb-d988bd9761a0" width="300px" >
+
+Hiểu đơn giản nếu layer 3 có sự thay đổi thì các layer ở phía trên sẽ được caching lại nghĩa là không cần phải tạo mới mà được sử dụng luôn. Nó sẽ build từ layer 3 xuống các layer dưới
+
+**Kỹ thuật tối ưu hóa quá trình build**
+
+Chuyển những instruction dùng chung cho mọi lần build (VD update OS, cài đặt chương trình...) lên trước để tận dụng khả năng cache của Docker
+
+Dùng small base image
 
 ### 2. Tạo Redis container từ DockerHub
 [:arrow_up: Mục lục](#mục-lục)
@@ -409,3 +433,11 @@ EXPOSE 3000                    -> Mở cổng trên container
 ```
 
 Tham khảo thêm tại: https://docs.docker.com/reference/dockerfile/
+
+### docker image build
+
+_Ví dụ:_ Build dockerfile có tên là `Dockerfile` ta thực hiện câu lệnh sau. Trong đó `demo` là tên file, `.` nghĩa là build tại vị trí hiện tại
+
+```
+docker image build -t demo -f Dockerfile .
+```
