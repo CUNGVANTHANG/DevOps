@@ -17,6 +17,7 @@
 | 3 | `docker version` | Show version của Docker client, Docker host |
 | 4 | [`docker info`](#docker-info) | Show ra các thông tin của docker client và docker host |
 | 5 | [`whereis`](#whereis) | Tìm location nơi chứa file binary của chương trình |
+| 6 | docker login | Login vào docker hub |
   
 </details>
 </details>
@@ -28,6 +29,8 @@
 - [2. Image vs Container](#2-image-vs-container)
 - [3. Container vs Virtual Machine](#3-container-vs-virtual-machine)
 - [4. Bài tập](#4-bài-tập)
+- [5. Tạo Redis container từ DockerHub](#5-tạo-redis-container-từ-dockerhub)
+- [6. Tạo container từ image](#6-tạo-container-từ-image)
 
 <details>
   <summary>Danh sách lệnh</summary>
@@ -40,7 +43,8 @@
 | 4 | `docker container --help` | Xem hướng dẫn các câu lệnh container |
 | 5 | `docker container stats [name_container]` | Xem các thông số trong container |
 | 6 | `docker container inspect [name_container] | Xem thông tin chi tiết của container |
-| 7 | [`netstat -plunt`](#netstat--plunt) | Xem trạng thái của các port (cổng) trên hệ thống |
+| 7 | `docker container diff [name_container]` | Xem các writable layer trong container |
+| 8 | [`netstat -plunt`](#netstat--plunt) | Xem trạng thái của các port (cổng) trên hệ thống |
   
 </details>
 </details>
@@ -49,7 +53,8 @@
   <summary>Docker image</summary>
 
 - [1. Docker image là gì](#1-docker-image-là-gì)
-- [2. Tạo Redis container từ DockerHub](#2-tạo-redis-container-từ-dockerhub)
+- [2. Dockerfile](#3-dockerfile)
+- [3. Tạo Docker image từ Docker container](#3-tạo-docker-image-từ-docker-container)
 
 <details>
   <summary>Danh sách lệnh</summary>
@@ -60,6 +65,8 @@
 | 2 | docker network create [name_network] |  Tạo môi trường để các container giao tiếp với nhau thông qua container name | 
 | 3 | [docker image history](#docker-image-history) |Xem các layer của docker image |
 | 4 | [docker image build](#docker-image-build) | Build dockerfile |
+| 5 | [docker container commit](#docker-container-commit) | Tạo docker image từ docker container |
+| 6 | [docker image tag](#docker-image-tag) | Thay đổi tên, tag của một docker image | 
 
 </details>
 </details>
@@ -153,7 +160,7 @@ Container **bản chất là một process** trên hệ thống
 #### docker container run
 [:arrow_up: Mục lục](#mục-lục)
 
-_Ví dụ:_ Trong đó `my-nginx` là tên container
+_Ví dụ 1:_ Trong đó `my-nginx` là tên container, `nginx` là tên image
 
 ```
 docker container run --name my-nginx -p 80:80 nginx
@@ -179,7 +186,14 @@ _Kết quả:_
 
 <img src="https://github.com/user-attachments/assets/a30f9a3b-0d72-4bdc-9843-2b2ae9743fb1" width="300px">
 
+_Ví dụ 2:_ Ta có thể kết hợp câu lệnh tạo container và câu lệnh truy cập vào container. Trong đó `new-container` là tên container, `new-ubuntu` là tên image
+
+```
+docker container run --name new-container -it new-ubuntu bash
+```
+
 ### netstat -plunt
+[:arrow_up: Mục lục](#mục-lục)
 
 Dùng để xem trạng thái của các port (cổng) trên hệ thống
 
@@ -205,7 +219,6 @@ Một VM tương đương với một server hoàn chỉnh: có phần cứng ri
 
 > [!NOTE]
 > Phù hợp để dựng môi trường hoàn chỉnh để triển khai / test application
-
 
 ### 4. Bài tập
 [:arrow_up: Mục lục](#mục-lục)
@@ -283,6 +296,40 @@ docker container inspect my-mysql
 
 <img src="https://github.com/user-attachments/assets/ee00f98c-6842-42b4-bf44-e5a9030e49a8" width="400px">
 
+### 5. Tạo Redis container từ DockerHub
+[:arrow_up: Mục lục](#mục-lục)
+
+Trước khi tạo docker container ta sẽ tạo docker network trước. Docker network là môi trường để các container giao tiếp với nhau thông qua container name. Ví dụ
+
+```
+docker network create test
+```
+
+Tiếp theo ta khởi tạo docker tên là `some-redis` bằng cách
+
+```
+docker run --name some-redis -d --network test redis
+```
+
+Cần client để gửi dữ liệu, ta cài đặt
+
+```
+docker run -it --network test --rm redis redis-cli -h some-redis
+```
+
+Để có thể kiểm tra ta đã có thể truy cập chưa, sử dụng câu lệnh `ping` để kiểm tra
+
+### 6. Tạo container từ image
+[:arrow_up: Mục lục](#mục-lục)
+
+Cách tạo rất đơn giản là tạo thêm layer mới lên trên layer của docker image (Docker thêm 1 writable layer lên trên các image layers)
+
+Hình dung là image layers là các layer read-only. Để có thể tạo container từ image ta chỉ cần thêm writable layer lên trên 
+
+<img src="https://github.com/user-attachments/assets/25064556-e4ad-4137-899f-f6b37a9044f9" width="300px" >
+
+<img src="https://github.com/user-attachments/assets/7073bffc-aa09-45f7-a865-375fc66baa97" width="300px" >
+
 ## III. Docker image
 [:arrow_up: Mục lục](#mục-lục)
 
@@ -299,7 +346,19 @@ Docker image là:
 - Có thể chỉ là 1 file có dung lượng khá nhỏ (VD alpine, busybox...)
 - Hoặc 1 file có dung lượng lớn (VD: mongodb, mysql, wordpress...)
 
+> [!IMPORTANT]
+> **3 cách để có Docker image**
+>- DockerHub: Download docker image từ public registry
+>- Dockerfile: Tạo docker image từ các instruction trong Dockerfile
+>- Docker container: Biến writable layer thành read only layer
+
+> [!IMPORTANT]
+> **2 cách để phân phối, chia sẻ Docker image cho người khác**
+>- Docker Registry: Dùng lệnh pull/push phân phối images lên Docker registry
+>- TAR file: 
+
 ### docker image ls
+[:arrow_up: Mục lục](#mục-lục)
 
 Liệt kê các image và dung lượng của nó
 
@@ -315,13 +374,8 @@ File microsoft word khi cài đặt trên máy sẽ ngốn 1.5GB trên ổ cứn
 
 Tương tự docker image giống như file microsoft word chiếm 1 dung lượng nhất định. Khi mà docker tạo docker container từ docker image thì nó sẽ ngốn CPU và RAM (vì nó là file template nên nó có thể tạo ra nhiều docker container nhưng vẫn sẽ chạy độc lập trên máy host)
 
-> [!IMPORTANT]
-> **3 cách để có Docker image**
->- DockerHub: Download docker image từ public registry
->- Dockerfile: Tạo docker image từ các instruction trong Dockerfile
->- Docker container
-
 #### Cấu trúc của Docker Image
+[:arrow_up: Mục lục](#mục-lục)
 
 Image tạo bởi 1 chuỗi layers. Mỗi layer là một sự thay đổi trên file system
 
@@ -370,30 +424,7 @@ _Kết quả:_
 
 Nếu ta cộng tất cả kích thước ở đây sẽ ra được kích thước thật của docker image
 
-### 2. Tạo Redis container từ DockerHub
-[:arrow_up: Mục lục](#mục-lục)
-
-Trước khi tạo docker container ta sẽ tạo docker network trước. Docker network là môi trường để các container giao tiếp với nhau thông qua container name. Ví dụ
-
-```
-docker network create test
-```
-
-Tiếp theo ta khởi tạo docker tên là `some-redis` bằng cách
-
-```
-docker run --name some-redis -d --network test redis
-```
-
-Cần client để gửi dữ liệu, ta cài đặt
-
-```
-docker run -it --network test --rm redis redis-cli -h some-redis
-```
-
-Để có thể kiểm tra ta đã có thể truy cập chưa, sử dụng câu lệnh `ping` để kiểm tra
-
-### 3. Dockerfile
+### 2. Dockerfile
 [:arrow_up: Mục lục](#mục-lục)
 
 - Là bản thiết kế tạo ra Docker image
@@ -558,21 +589,41 @@ Thì cách hoạt động là state 1 sẽ là input cho state 2 đóng gói th�
 
 <img src="https://github.com/user-attachments/assets/9c4173cd-6fcb-46ab-ac21-4ea4d7cf65da" width="500px" >
 
-### 4. Tạo container từ image
+### 3. Tạo Docker image từ Docker Container
 [:arrow_up: Mục lục](#mục-lục)
 
-Cách tạo rất đơn giản là tạo thêm layer mới lên trên layer của docker image (Docker thêm 1 writable layer lên trên các image layers)
+Cách để tạo Docker image từ Docker Container ta sẽ biến writable layer thành read only layer
 
-Hình dung là image layers là các layer read-only. Để có thể tạo container từ image ta chỉ cần thêm writable layer lên trên 
+### docker container commit
+[:arrow_up: Mục lục](#mục-lục)
 
-<img src="https://github.com/user-attachments/assets/25064556-e4ad-4137-899f-f6b37a9044f9" width="300px" >
+Cú pháp: 
 
-<img src="https://github.com/user-attachments/assets/7073bffc-aa09-45f7-a865-375fc66baa97" width="300px" >
+```
+docker container commit <container> <image>
+```
 
+<img src="https://github.com/user-attachments/assets/719873aa-cb4e-4e11-9581-19a35ac88541" width="500px" >
 
+_Ví dụ:_
 
+```
+docker container commit my-container new-image
+```
 
+### 4. Phân phối, chia sẻ Docker image bằng Docker registry
+[:arrow_up: Mục lục](#mục-lục)
 
+Để có thể làm điều đó ta sẽ dùng lệnh pull/push phân phối images lên Docker registry
 
+### docker image tag
+[:arrow_up: Mục lục](#mục-lục)
 
+Dùng để thay đổi tên, tag của docker image
+
+Cú pháp:
+
+```
+docker image tag <source>:<tag> <target>:<tag>
+```
 
