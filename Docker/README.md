@@ -438,7 +438,19 @@ Tại sao phải tối ưu hóa quá trình build. Đơn giản là để đỡ 
 ### docker image build
 [:arrow_up: Mục lục](#mục-lục)
 
-_Ví dụ:_ Build dockerfile có tên là `Dockerfile` ta thực hiện câu lệnh sau. Dấu `.` nghĩa là build tại vị trí hiện tại là thư mục demo
+Cú pháp:
+
+```
+docker image build -t <tag> <context>
+```
+
+Docker sử dụng Dockerfile và **build context** để build image
+
+Build context là môi trường cung cấp file cần thiết để docker build. Có thể là local filesystem, git repository,...
+
+Câu lệnh build có thể truy cập vào bất cứ file nào nằm trong context
+
+_Ví dụ:_ Build dockerfile có tên là `Dockerfile` ta thực hiện câu lệnh sau. `demo` là tên docker image, dấu `.` nghĩa là build tại vị trí hiện tại là thư mục demo
 
 Cấu trúc thư mục:
 
@@ -475,7 +487,7 @@ Nếu file `demo` bị thay đổi thì chỉ chạy lại layer tại `COPY . .
 
 **Cách 2**: Dùng small base image
 
-**Cách 3**: Dùng `.dockerignore` file
+**Cách 3**: Dùng `.dockerignore` file để giảm đi kích thước của docker image
 
 _Ví dụ:_ Ta có cấu trúc thư mục sau
 
@@ -491,4 +503,73 @@ Bây giờ ta muốn bỏ qua thư mục `useless_folder` trong quá trình buil
 ```dockerignore
 /useless_folder
 ```
+
+**Cách 4:** Sử dụng Multi-stage build
+
+_Ví dụ minh họa:_
+
+```dockerfile
+# syntax=docker/dockerfile:1
+FROM golang:1.21
+WORKDIR /src
+COPY <<EOF ./main.go
+package main
+
+import "fmt"
+
+func main() {
+  fmt.Println("hello, world")
+}
+EOF
+RUN go build -o /bin/hello ./main.go
+
+FROM scratch
+COPY --from=0 /bin/hello /bin/hello
+CMD ["/bin/hello"]
+```
+
+Hiểu đơn giản như sau, ta có Stage 1 là 
+
+```dockerfile
+# syntax=docker/dockerfile:1
+FROM golang:1.21
+WORKDIR /src
+COPY <<EOF ./main.go
+package main
+
+import "fmt"
+
+func main() {
+  fmt.Println("hello, world")
+}
+EOF
+RUN go build -o /bin/hello ./main.go
+```
+
+Stage 2 sẽ là:
+
+```dockerfile
+FROM scratch
+COPY --from=0 /bin/hello /bin/hello
+CMD ["/bin/hello"]
+```
+
+Thì cách hoạt động là state 1 sẽ là input cho state 2 đóng gói thành container
+
+<img src="https://github.com/user-attachments/assets/9c4173cd-6fcb-46ab-ac21-4ea4d7cf65da" width="500px" >
+
+### 4. Tạo container từ image
+[:arrow_up: Mục lục](#mục-lục)
+
+
+
+
+
+
+
+
+
+
+
+
 
