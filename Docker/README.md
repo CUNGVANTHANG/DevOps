@@ -67,7 +67,7 @@
 | 1 | [`docker image ls`](#docker-image-ls) | Liệt kê các image và dung lượng của nó | 
 | 2 | `docker network create [name_network]` |  Tạo môi trường để các container giao tiếp với nhau thông qua container name | 
 | 3 | [`docker image history`](#docker-image-history) |Xem các layer của docker image |
-| 4 | [`docker image build`](#docker-image-build) | Build dockerfile |
+| 4 | [`docker image build`](#docker-image-build) | Build dockerfile (Tạo docker image từ Dockerfile) |
 | 5 | [`docker container commit`](#docker-container-commit) | Tạo docker image từ docker container |
 | 6 | [`docker image tag`](#docker-image-tag) | Thay đổi tên, tag của một docker image | 
 | 7 | `docker image push [image or account/image]` | Push image lên docker hub | 
@@ -477,17 +477,15 @@ Tại sao phải tối ưu hóa quá trình build. Đơn giản là để đỡ 
 ### docker image build
 [:arrow_up: Mục lục](#mục-lục)
 
+Dùng để build dockerfile (Tạo docker image từ Dockerfile).
+
 Cú pháp:
 
 ```
 docker image build -t <tag> <context>
 ```
 
-Docker sử dụng Dockerfile và **build context** để build image
-
-Build context là môi trường cung cấp file cần thiết để docker build. Có thể là local filesystem, git repository,...
-
-Câu lệnh build có thể truy cập vào bất cứ file nào nằm trong context
+Docker sử dụng Dockerfile và **build context** để build image. Build context là môi trường cung cấp file cần thiết để docker build. Có thể là local filesystem, git repository,... Câu lệnh build có thể truy cập vào bất cứ file nào nằm trong context
 
 _Ví dụ:_ Build dockerfile có tên là `Dockerfile` ta thực hiện câu lệnh sau. `demo` là tên docker image, dấu `.` nghĩa là build tại vị trí hiện tại là thư mục demo
 
@@ -525,6 +523,8 @@ Xong đó sử dụng câu lệnh `ls` để xem kết quả. Tất cả file tr
 Nếu file `demo` bị thay đổi thì chỉ chạy lại layer tại `COPY . .` xuống các layer phía dưới tránh được mất thời gian build lại từ đầu
 
 **Cách 2**: Dùng small base image
+
+Small base image ở đấy là các image có kích thước nhỏ (Tham khảo tại DockerHub). Điển hình là `alpine`
 
 **Cách 3**: Dùng `.dockerignore` file để giảm đi kích thước của docker image
 
@@ -764,4 +764,33 @@ java -jar target/demo-0.0.1-SNAPSHOT.jar
 
 **Đóng gói**
 
-Để có thể đóng gói, chúng ta cần tạo `Dockerfile`
+Để có thể đóng gói, chúng ta cần tạo `Dockerfile` với nội dung như sau:
+
+```dockerfile
+FROM maven:3.9.4-eclipse-temurin-17-alpine AS build
+WORKDIR /app
+COPY . .
+RUN mvn clean package
+
+FROM openjdk:17-alpine
+COPY --from=build /app/target/demo-0.0.1-SNAPSHOT.jar app.jar
+CMD ["java", "-jar", "app.jar"]
+```
+
+Đồng thời tạo thêm file `.dockerignore` để loại bỏ thư mục mà ta không muốn đóng gói. Ở đây tôi không muốn đóng gói thư mục `target`
+
+```
+./target
+```
+
+Thực hiện câu lệnh để tiến hành đóng gói
+
+```
+docker image build -t springboot-demo .
+```
+
+**Kết quả:**
+
+![image](https://github.com/user-attachments/assets/6fff7a14-0f28-4fa1-92ca-f676c71a238c)
+
+
