@@ -77,6 +77,21 @@
 </details>
 </details>
 
+<details>
+  <summary>Docker volume</summary>
+
+- [1. Persistent Data](#1-persistent-data)
+- [2. Bind Mount](#2-bind-mount)
+
+<details>
+  <summary>Danh sách lệnh</summary>
+
+| STT | Lệnh | Tác dụng |
+| :--: | :--: | :--: |
+
+</details>
+</details>
+
 ## I. Cách Docker hoạt động
 ### 1. Kiến trúc Docker
 [:arrow_up: Mục lục](#mục-lục)
@@ -791,6 +806,21 @@ docker image build -t springboot-demo .
 
 **Kết quả:**
 
-![image](https://github.com/user-attachments/assets/6fff7a14-0f28-4fa1-92ca-f676c71a238c)
+<img src="https://github.com/user-attachments/assets/6fff7a14-0f28-4fa1-92ca-f676c71a238c" width="500px" >
+
+## IV. Docker volume
+[:arrow_up: Mục lục](#mục-lục)
+
+### 1. Persistent Data
+[:arrow_up: Mục lục](#mục-lục)
+
+**Tại sao cần Persistent Data?**
+
+> **Container được thiết kế để dễ dàng thay thế**
+
+Chính vì vậy, trong trường hợp container đó bị stop (chương trình trong container đó bị lỗi hoặc gặp vấn đề nào đó) thì sẽ tạo mới và thay thế container đó. Tuy nhiên, dữ liệu trong container hầu như là volatile 
+
+### 2. Bind Mount
+[:arrow_up: Mục lục](#mục-lục)
 
 
