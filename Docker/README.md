@@ -336,6 +336,8 @@ Hình dung là image layers là các layer read-only. Để có thể tạo cont
 
 <img src="https://github.com/user-attachments/assets/7073bffc-aa09-45f7-a865-375fc66baa97" width="300px" >
 
+Câu lệnh sử dụng [`docker container run`](#docker-container-run)
+
 ## III. Docker image
 [:arrow_up: Mục lục](#mục-lục)
 
@@ -712,4 +714,54 @@ docker load -i redis.taz
 
 <img src="https://github.com/user-attachments/assets/d6cd10e3-154d-40b5-9b76-a438f974aefd" width="500px" >
 
+### 6. Bài tập
+[:arrow_up: Mục lục](#mục-lục)
 
+1. Đóng gói Docker image cho chương trình Java Spring Boot
+2. Đóng gói Docker image cho chương trình Python Django
+3. Đóng gói Docker image cho chương trình NodeJS
+
+**Lời giải:**
+
+#### 1. Đóng gói Docker image cho chương trình Java Spring Boot
+
+Đầu tiên để có thể tạo ra 1 project cho chương trình Java Spring Boot, ta lên [https://start.spring.io/](https://start.spring.io/) để cài đặt các dependencies và chọn **Generate** để tải xuống
+
+<img src="https://github.com/user-attachments/assets/49d34d3d-bc6b-4c2c-a03f-05068a961bf2" width="500px" >
+
+Chúng ta sẽ được project như sau:
+
+<img src="https://github.com/user-attachments/assets/d27fe140-e806-47cb-a012-2f81ad5d1138" width="500px" >
+
+Chúng ta sẽ bắt đầu với dự án đầu tiên cho project này rồi sẽ đóng gói nó lại...
+
+Bắt đầu chương trình đầu tiên tại [https://spring.io/guides/gs/spring-boot](https://spring.io/guides/gs/spring-boot). Bằng cách tạo chương trình Hello World đầu tiên
+
+<img src="https://github.com/user-attachments/assets/a299c38b-d678-4612-85f8-19cf73442b63" width="500px" >
+
+Trước tiên ta sẽ chạy chương trình tại localhost trước khi đóng gói 
+
+Sử dụng câu lệnh tại thư mục demo
+
+```
+mvn clean package
+```
+
+<img src="https://github.com/user-attachments/assets/c708a4c0-819e-4ad7-ac5e-5f435d290b79" width="500px" >
+
+Tiếp theo sử dụng câu lệnh 
+
+```
+java -jar target/demo-0.0.1-SNAPSHOT.jar
+```
+
+<img src="https://github.com/user-attachments/assets/8b067645-644f-4cc4-88ef-8371c7d63062" width="500px" >
+
+
+**Kết quả:**
+
+![image](https://github.com/user-attachments/assets/9c765449-2f94-4b39-8570-5f1de65d2fe3)
+
+**Đóng gói**
+
+Để có thể đóng gói, chúng ta cần tạo `Dockerfile`
