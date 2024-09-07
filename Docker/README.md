@@ -816,11 +816,60 @@ docker image build -t springboot-demo .
 
 **Tại sao cần Persistent Data?**
 
-> **Container được thiết kế để dễ dàng thay thế**
+> **Container được thiết kế rất nhỏ gọn để dễ dàng thay thế**
 
-Chính vì vậy, trong trường hợp container đó bị stop (chương trình trong container đó bị lỗi hoặc gặp vấn đề nào đó) thì sẽ tạo mới và thay thế container đó. Tuy nhiên, dữ liệu trong container hầu như là volatile 
+Chính vì vậy, trong trường hợp container đó bị stop (chương trình trong container đó bị lỗi hoặc gặp vấn đề nào đó) thì sẽ tạo mới và thay thế container đó. Tuy nhiên, dữ liệu trong container hầu như là volatile (nghĩa là khi container bị chết đi thay thế bằng container mới khác thì đồng thời dữ liệu đó sẽ bị mất)
+
+<img src="https://github.com/user-attachments/assets/aff8f6d6-6671-40ba-990a-ee29fa6b7803" width="500px" >
+
+Đó là lý do chúng ta cần Persistent Data để **tách biệt lưu trữ dữ liệu ra khỏi container**
+
+**Đầu tiên cần hiểu cách cơ chế tạo mới, thay thế container**
+
+<img src="https://github.com/user-attachments/assets/dc51d43e-b046-4dc3-bb26-8695f8f4f21b" width="500px" >
+
+Cấu tạo của container gồm có các layer, trong đó: 
+- layer màu đỏ là layer image (read only)
+- layer màu xanh là writable
+
+> **Khi mà container được tạo mới và thay thế thì nó chỉ thay thế writable và giữ nguyên layer image**
+
+> [!NOTE]
+> **2 cách tạo Persistent Data**
+> - Bind Mount: Tạo kết nối giữa thư mục trong container với thư mục trong host
+> - Volume
 
 ### 2. Bind Mount
 [:arrow_up: Mục lục](#mục-lục)
 
+> **Bind Mount dựa trên một khái niệm gọi là mouting**
 
+Mouting: gắn một device A vào bên trong filesystem của một device B khác. Mục đích là từ device B có thể nhìn thấy, truy cập dữ liệu bên trong device A
+
+_Ví dụ:_
+
+Cắm USB (device A) vào trong máy tính (device B) thì mục đích ở đây là trong laptop ta có thể nhìn được vào file trong device A. Trong trường hợp này là thư mục **/my-usb** nằm trong filesystem của device B nối filesystem của device A (nghĩa là có thể nhìn thấy được dữ liệu của usb trong file my-usb trên laptop)
+
+<img src="https://github.com/user-attachments/assets/7b9e6b66-bc22-46e1-9fcc-1d133dc8dfcc" width="500px" >
+
+**Vậy trong container thì hoạt động như nào?**
+
+<img src="https://github.com/user-attachments/assets/1f5f483a-e58e-4a78-8af9-8db1be710bf3" width="500px" >
+
+Host là laptop của ta chứa các filesystem, Container cũng chứa các filesystem của riêng nó. 
+
+Bản chất của Bind Mount là ta tạo ra một thư mục **../khalid/nginx** chứa data trên host (laptop) được lưu trên chính hard drive (ổ cứng của laptop) sau đó sẽ mouting với thư mục **/app** của container. 
+
+Kết quả là toàn bộ dữ liệu trên thư mục **../khalid/nginx** sẽ nằm bên trong thư mục **/app** của container
+
+**Cách tạo bind mount**
+
+```
+docker container run -v /home/khalid/nginx:/app nginx:latest 
+```
+
+- `/home/khalid/nginx`: Thư mục trên máy host
+- `/app`: Thư mục trên container
+- `$(pwd)`: thay thế cho đường dẫn đến thư mục hiện tại trên máy host
+
+_Chú ý:_ Nếu thư mục chưa tồn tại thì Docker sẽ tự động tạo thư mục đó
