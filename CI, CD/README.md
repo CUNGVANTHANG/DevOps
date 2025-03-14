@@ -151,5 +151,14 @@ Xong chọn Create request mới
 
 <img src="https://github.com/user-attachments/assets/2ccb8068-03ea-48b0-aa23-bc7b5690acb3" width="400px" >
 
+**Bước 4: Branch protection rules**
+
+<img src="https://github.com/user-attachments/assets/e2cb447f-b13b-4321-96cd-d01c1386a8da" width="400px" >
+
+Mình không muốn người ta push trực tiếp lên branch này của mình thì chọn các yêu cầu muốn
+
+<img src="https://github.com/user-attachments/assets/df869d38-8844-44db-8a7f-738ac416e013" width="400px" >
+
+
 
 
