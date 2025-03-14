@@ -134,3 +134,22 @@ Mỗi lần push code hoặc tạo PR vào nhánh chính, GitHub sẽ tự độ
 **Bước 3:** Sau khi configure `node.js.yml` thì chúng ta sẽ commit
 
 <img src="https://github.com/user-attachments/assets/1d0d29cf-4c6d-49e5-859c-fc54f2fc79ec" width="400px" >
+
+Ví dụ: Ta đẩy code mới từ nhánh mới là `update` lên github
+
+<img src="https://github.com/user-attachments/assets/a8e12759-d449-41dd-ba30-0f9a0fe82466" width="400px" >
+
+Sau khi đẩy lên, ta chọn **Compare & pull request**
+
+<img src="https://github.com/user-attachments/assets/10e30dbc-8cda-4dfa-9a76-792faf80e65b" width="400px" >
+
+Xong chọn Create request mới
+
+<img src="https://github.com/user-attachments/assets/290d6940-65e0-4148-9f9c-5fff04eeb2ec" width="400px" >
+
+<br> 
+
+<img src="https://github.com/user-attachments/assets/2ccb8068-03ea-48b0-aa23-bc7b5690acb3" width="400px" >
+
+
+
