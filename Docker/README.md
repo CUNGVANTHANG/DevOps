@@ -1,4 +1,9 @@
 ## Docker
+
+Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường chạy (như Node, Python, DB, OS...) vào một "hộp" gọi là container, để:
+
+👉 Chạy ở đâu cũng được, không lo lệch môi trường giữa máy dev, test, hay production.
+
 ## Mục lục
 
 <details>
@@ -873,3 +878,12 @@ docker container run -v /home/khalid/nginx:/app nginx:latest
 - `$(pwd)`: thay thế cho đường dẫn đến thư mục hiện tại trên máy host
 
 _Chú ý:_ Nếu thư mục chưa tồn tại thì Docker sẽ tự động tạo thư mục đó
+
+### 3. Ví dụ để dễ hình dung hơn
+[:arrow_up: Mục lục](#mục-lục)
+
+Đây là thư mục dự án code của ta
+
+![image](https://github.com/user-attachments/assets/c80f2cbb-1d8d-47cc-8066-ce67e092183a)
+
+Bây giờ ta sẽ thực hiện tạo 1 container 
