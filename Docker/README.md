@@ -1,4 +1,4 @@
-## Docker
+![image](https://github.com/user-attachments/assets/4c32742c-3c2d-4b25-af53-32200f7289ad)## Docker
 
 Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường chạy (như Node, Python, DB, OS...) vào một "hộp" gọi là container, để:
 
@@ -887,3 +887,27 @@ _Chú ý:_ Nếu thư mục chưa tồn tại thì Docker sẽ tự động tạ
 ![image](https://github.com/user-attachments/assets/c80f2cbb-1d8d-47cc-8066-ce67e092183a)
 
 Bây giờ ta sẽ thực hiện tạo 1 container 
+
+```
+docker run --name docker-ubuntu -d -v $(pwd)/Docker:/app ubuntu sleep infinity
+```
+
+![image](https://github.com/user-attachments/assets/15442380-7e46-4ad0-944e-471967e5047a)
+
+Bây giờ, ta sẽ đi vào trong container `docker-ubuntu` để xem có tồn tại **thư mục dự án code** của ta hay không bằng cách
+
+```
+docker container exec -it docker-ubuntu bash
+```
+
+![image](https://github.com/user-attachments/assets/4972c0f9-dd10-4af3-b789-c2de0698956f)
+
+Như ta có thể thấy **thư mục dự án code** của ta đã được **mount** với **thư mục app** trong container có tên là `docker-ubuntu`
+
+Như chúng ta được biết thì nếu như có sự thay đổi trong **thư mục dự án code** của ta thì ta sẽ ngay lập tức thấy được sự thay đổi trên **thư mục app** trong container có tên là `docker-ubuntu`
+
+![image](https://github.com/user-attachments/assets/f7d4b78e-b064-452b-8cb6-7e2446dd92fc)
+
+Câu lệnh bên trái là phía host, câu lệnh bên phải là phía container. Ta có thể thấy sự thay đổi ở máy host thì trong container cũng được cập nhật giống như vậy
+
+
