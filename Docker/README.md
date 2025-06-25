@@ -88,6 +88,7 @@ Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường c
 - [1. Persistent Data](#1-persistent-data)
 - [2. Bind Mount](#2-bind-mount)
 - [3. Ví dụ về Bind Mount](#3-ví-dụ-về-bind-mount)
+- [4. Volume là gì](#4-volume-là-gì)
 
 <details>
   <summary>Danh sách lệnh</summary>
@@ -959,3 +960,52 @@ Như hình ảnh trên cho ta thấy, nếu có nhiều container bind mount t�
 > - **Bind mount về cơ bản là việc dữ liệu trên máy host được mount đến thư mục container**
 > - **Khi khởi tạo container, nếu thư mục trong container có dữ liệu, nó sẽ bị overwrite bởi dữ liệu của máy host**
 > - **Sử dụng read-only để tránh việc container thay đổi nội dung trên host**
+
+### 4. Volume là gì
+[:arrow_up: Mục lục](#mục-lục)
+
+Volume là gì:
+
+- **Mục đích tương tự như Bind Mount: Nó lưu trữ và bảo vệ dữ liệu container khi container đó bị xóa đi**
+- **Docker hoàn toàn quản lý volume**
+- **Cách hoạt động:** Gần giống với bind mount nhưng về mouting thì theo chiều ngược lại. Với volume thì ta **lựa chọn ra 1 thư mục trong container** rồi ánh xạ một vùng nhớ rồi mouting tới 1 thư mục nào đó trên máy host
+
+![image](https://github.com/user-attachments/assets/15ce4070-1bd1-49f7-9901-aad5747ac1b3)
+
+
+- **Cách tạo volume:**
+
+![image](https://github.com/user-attachments/assets/865b8152-5738-4b11-83ff-ca5823a3ec1a)
+
+```
+docker container run -v ubuntu-data:/app ubuntu:latest
+```
+
+Trong đó:
+ 
+- `ubuntu-data`: Tên của volume (Có thể có hoặc không, nếu không đặt tên thì docker sẽ tự tạo giúp chúng ta 1 anonymous volume với name là 1 chuỗi unique)
+- `/app`: Tên thư mục của container
+- Tên volume có thể lược bỏ nếu volume được chỉ định trong Dockerfile
+
+### 5. Ví dụ về Volume
+[:arrow_up: Mục lục](#mục-lục)
+
+Tạo một container có tên là `cvt-nginx` và có volume là `nginx-data` bằng câu lệnh sau
+
+```
+docker container run --name cvt-nginx -p 81:80 -v nginx-data:/usr/share/html/nginx -d nginx
+```
+
+![image](https://github.com/user-attachments/assets/3df830bc-bc81-42de-b80d-a0f971df2160)
+
+Câu lệnh để liệt kê các volume tồn tại trong docker
+
+```
+docker volume ls
+```
+
+Câu lệnh để xem thông tin chi tiết của volume
+
+```
+docker volume inspect [volume_name]
+```
