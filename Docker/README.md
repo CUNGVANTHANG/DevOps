@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/4c32742c-3c2d-4b25-af53-32200f7289ad)## Docker
+## Docker
 
 Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường chạy (như Node, Python, DB, OS...) vào một "hộp" gọi là container, để:
 
@@ -47,7 +47,7 @@ Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường c
 | 3 | `docker container exec -it [name_container] bash` | Truy cập vào container sử dụng câu lệnh giống Ubuntu |
 | 4 | `docker container --help` | Xem hướng dẫn các câu lệnh container |
 | 5 | `docker container stats [name_container]` | Xem các thông số trong container |
-| 6 | `docker container inspect [name_container] | Xem thông tin chi tiết của container |
+| 6 | `docker container inspect [name_container]` | Xem thông tin chi tiết của container |
 | 7 | `docker container diff [name_container]` | Xem các writable layer trong container |
 | 8 | `docker container prune` | Xóa tất cả các container ở trạng thái Stopped |
 | 9 | [`netstat -plunt`](#netstat--plunt) | Xem trạng thái của các port (cổng) trên hệ thống |
@@ -87,6 +87,7 @@ Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường c
 
 - [1. Persistent Data](#1-persistent-data)
 - [2. Bind Mount](#2-bind-mount)
+- [3. Ví dụ về Bind Mount](#3-ví-dụ-về-bind-mount)
 
 <details>
   <summary>Danh sách lệnh</summary>
@@ -879,14 +880,14 @@ docker container run -v /home/khalid/nginx:/app nginx:latest
 
 _Chú ý:_ Nếu thư mục chưa tồn tại thì Docker sẽ tự động tạo thư mục đó
 
-### 3. Ví dụ để dễ hình dung hơn
+### 3. Ví dụ về Bind Mount
 [:arrow_up: Mục lục](#mục-lục)
 
 Đây là thư mục dự án code của ta
 
 ![image](https://github.com/user-attachments/assets/c80f2cbb-1d8d-47cc-8066-ce67e092183a)
 
-Bây giờ ta sẽ thực hiện tạo 1 container 
+Bây giờ ta sẽ thực hiện tạo 1 container và mount với **thư mục app** trên container
 
 ```
 docker run --name docker-ubuntu -d -v $(pwd)/Docker:/app ubuntu sleep infinity
@@ -904,10 +905,57 @@ docker container exec -it docker-ubuntu bash
 
 Như ta có thể thấy **thư mục dự án code** của ta đã được **mount** với **thư mục app** trong container có tên là `docker-ubuntu`
 
+- **Test 1: Thay đổi dữ liệu trên máy host** 
+
 Như chúng ta được biết thì nếu như có sự thay đổi trong **thư mục dự án code** của ta thì ta sẽ ngay lập tức thấy được sự thay đổi trên **thư mục app** trong container có tên là `docker-ubuntu`
 
 ![image](https://github.com/user-attachments/assets/f7d4b78e-b064-452b-8cb6-7e2446dd92fc)
 
 Câu lệnh bên trái là phía host, câu lệnh bên phải là phía container. Ta có thể thấy sự thay đổi ở máy host thì trong container cũng được cập nhật giống như vậy
 
+- **Test 2: Container bị stop hoặc bị die**
 
+Trong trường hợp container đó bị stop hoặc bị die thì dữ liệu sẽ không bị xóa đi, mà vẫn còn tồn tại trong máy host (Máy tính của ta)
+
+![image](https://github.com/user-attachments/assets/10e3b97a-c8af-490c-8df7-c70af7826a21)
+
+Như ví dụ hình ảnh trên ta thực hiện xóa container có tên là docker-ubuntu, xong đó thực hiện kiểm tra lại dữ liệu trên máy host
+
+- **Test 3: Thay đổi dữ liệu trên container**
+
+Nếu ta vẫn sử dụng câu lệnh như ở phía trên để tạo ra container có volume
+
+```
+docker run --name docker-ubuntu -d -v $(pwd)/Docker:/app ubuntu sleep infinity
+```
+
+![image](https://github.com/user-attachments/assets/0b4c75e1-e3bf-4c0b-b05f-efd7c35ce119)
+
+Như trên hình ảnh, ta có thể thấy ban đầu kiểm tra data trong file `newtext` là `content from host`, nhưng trên container đã có quyền thay đổi dữ liệu đó thành `content from container`. Ta kiểm tra trên máy host thì cũng thấy điều đó.
+
+> [!NOTE]
+> **Vậy thì làm thế nào để dữ liệu trên máy host không bị thay đổi? Nghĩa là ta muốn container chỉ có thể đọc dữ liệu được mout từ máy host thôi**
+> Như chúng ta biết khi khởi tạo mới 1 container rất có thể dữ liệu mới trong container này sẽ ghi đè lại dữ liệu cũ trên máy host. 
+
+- **Test 4: Không cho phép thay đổi dữ liệu trên container**
+
+Để cấm container có thể thay đổi dữ liệu, thì ta sử dụng thêm 1 options `:ro` vào trong câu lệnh
+
+```
+docker run --name docker-ubuntu -d -v $(pwd)/Docker:/app:ro ubuntu sleep infinity
+```
+
+![image](https://github.com/user-attachments/assets/84a6d61c-8a25-43f0-8ca0-46363637a91f)
+
+Như trên hình ảnh, ta có thể thấy container không thể thay đổi dữ liệu, mà chỉ có thể đọc (read-only)
+
+- **Kết luận**
+
+![image](https://github.com/user-attachments/assets/f468273a-8135-48a7-8eab-9dce5ae5148a)
+
+Như hình ảnh trên cho ta thấy, nếu có nhiều container bind mount tới cùng 1 phân vùng dữ liệu trên máy host thì sự thay đổi dữ liệu sẽ được lan tỏa ra các container khác. Nghĩa là tất cả các container có thế nhận thấy được sự thay đổi dữ liệu đó
+
+> [!NOTE]
+> - **Bind mount về cơ bản là việc dữ liệu trên máy host được mount đến thư mục container**
+> - **Khi khởi tạo container, nếu thư mục trong container có dữ liệu, nó sẽ bị overwrite bởi dữ liệu của máy host**
+> - **Sử dụng read-only để tránh việc container thay đổi nội dung trên host**
