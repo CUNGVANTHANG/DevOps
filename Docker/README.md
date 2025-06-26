@@ -89,6 +89,31 @@ Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường c
 - [2. Bind Mount](#2-bind-mount)
 - [3. Ví dụ về Bind Mount](#3-ví-dụ-về-bind-mount)
 - [4. Volume là gì](#4-volume-là-gì)
+- [5. Ví dụ về Volume](#5-ví-dụ-về-volume)
+
+<details>
+  <summary>Danh sách lệnh</summary>
+
+| STT | Lệnh | Tác dụng |
+| :--: | :--: | :--: |
+
+</details>
+</details>
+
+<details>
+  <summary>Docker network</summary>
+
+<details>
+  <summary>Danh sách lệnh</summary>
+
+| STT | Lệnh | Tác dụng |
+| :--: | :--: | :--: |
+
+</details>
+</details>
+
+<details>
+  <summary>Docker compose</summary>
 
 <details>
   <summary>Danh sách lệnh</summary>
@@ -990,6 +1015,8 @@ Trong đó:
 ### 5. Ví dụ về Volume
 [:arrow_up: Mục lục](#mục-lục)
 
+**Test 1: Tạo volume có tên**
+
 Tạo một container có tên là `cvt-nginx` và có volume là `nginx-data` bằng câu lệnh sau
 
 ```
@@ -1009,3 +1036,73 @@ Câu lệnh để xem thông tin chi tiết của volume
 ```
 docker volume inspect [volume_name]
 ```
+
+**Test 2: Tạo volume không có tên**
+
+Tạo một container có tên là `cvt-nginx` và có volume nhưng không đặt tên bằng câu lệnh sau:
+
+```
+docker container run --name cvt-nginx -p 81:80 -v /usr/share/html/nginx -d nginx
+```
+
+![image](https://github.com/user-attachments/assets/b518d396-caeb-4246-83ab-524f6c02f818)
+
+Như ta có thể thấy volume này được docker tự động đặt tên cho là một chuỗi unique, việc không đặt tên này sẽ khó cho việc quản lý volume, nên đặt tên cho volume để dễ quản lý hơn
+
+Để xóa volume trong docker volume ta sử dụng câu lệnh sau:
+
+```
+docker volume rm [volume_name]
+```
+
+Khi ta xóa container thì volume của container đó vẫn tồn tại, việc cần làm là chúng ta cần phải xóa 2 lần: xóa container xong xóa volume. Như vậy chưa tối ưu lắm, người ta có thể sử dụng `--rm` trong lúc khởi tạo container. Khi mà container bị xóa đi thì volume đó sẽ đồng thời bị xóa đi theo
+
+```
+docker container run --name cvt-nginx -p 81:80 --rm -v /usr/share/html/nginx -d nginx
+```
+
+**Test 3: Tạo volume không cần option `-v`**
+
+_Ví dụ:_ Tạo một docker cho database mysql:8.0
+
+```
+docker container run --name cvt-mysql -e MYSQL_ROOT_PASSWORD=password123 -e MYSQL_DATABASE=db_example -d mysql:8.0
+```
+
+![image](https://github.com/user-attachments/assets/54bb9e35-1222-48c5-b13d-12166cba7590)
+
+Chúng ta có thể thấy ta tạo docker volume không cần đến option `-v`. Lí do tại sao lại như vậy?. **Trong quá trình docker image mysql:8.0 này thì Dockerfile của nó đã chỉ định volume ở trong đó**. Để kiểm tra thì chúng ta có thể lên DockerHub tìm tới phiên bản **mysql:8.0** có thể thấy trong Dockerfile đã chỉ định volume ở trong đó rồi.
+
+![image](https://github.com/user-attachments/assets/644a2b85-75a0-4489-97e9-73eac1db292c)
+
+> [!NOTE]
+> **Vậy chúng ta có 2 cách để tạo ra docker volume:**
+> - **Tạo trực tiếp bằng câu lệnh với option `-v`**
+> - **Tạo gián tiếp bằng cách chỉ định volume trong Dockerfile, không cần sử dụng option `-v`**
+
+**Câu hỏi làm sao để biết được docker image có volume ở bên trong không và volume đó nằm ở thư mục nào?**
+
+Chúng ta sử dụng câu lệnh sau:
+
+```
+docker image inspect [image_name] | grep -A 2 Volume
+```
+
+![image](https://github.com/user-attachments/assets/ba070487-87e6-4e2b-bdba-1ebb817031e2)
+
+![image](https://github.com/user-attachments/assets/84306fea-aafc-4292-97c7-64ce3cbeb94d)
+
+Như chúng ta có thể thấy **mysql có volume**, nginx thì không có volume (hiển thị là null)
+
+**Tương tự ta cũng có thể kiếm tra xem container bất kỳ có volume bên trong không?**
+
+Chúng ta sử dụng câu lệnh sau:
+
+```
+docker container inspect [container_name] | grep -A 3 Mounts
+```
+
+![image](https://github.com/user-attachments/assets/b420df54-8d85-418c-9cfd-6f392d4ee334)
+
+
+
