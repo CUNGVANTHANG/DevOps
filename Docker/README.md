@@ -1175,3 +1175,33 @@ Như vậy thì container `cvt-nginx3` sẽ dùng 3 volume `data`, `data2`, `dat
 ### 7. Utility containers
 [:arrow_up: Mục lục](#mục-lục)
 
+- Là các container môi trường, giúp ta chạy chương trình (programs), thử nghiệm mô hình
+- Biển Docker trở thành công cụ vô cùng hiệu quả cho mọi bài toán test app, triển khai thử môi trường
+
+**Hiểu đơn giản là:** Bình thường để chạy được chương trình ta cần cài thư viện (cài môi trường) trực tiếp trên máy host (máy tính của ta). Nhưng nếu sử dụng Docker thì ta không cần phải cài trực tiếp vào máy host nữa, mà ta chỉ cần chạy chương trình đó thông qua Docker.
+
+_Ví dụ:_ Bây giờ tôi muốn chạy chương trình nodejs này. Hiện tại chưa cài đặt thư viện `express`. Tôi muốn chạy chương trình này sử dụng docker thay vì phải cài trực tiếp trên máy host
+
+![image](https://github.com/user-attachments/assets/5bdecb45-a07a-4744-8201-a95cfcde51f0)
+
+Thực hiện tạo Dockerfile để cấu hình phiên bản Nodejs
+
+```
+FROM node:latest
+VOLUME ["/app"]
+ENTRYPOINT ["tail", "-f", "/dev/null"]
+```
+
+![image](https://github.com/user-attachments/assets/2c02b1a0-ea99-4703-aed2-b6db4b41e066)
+
+Sau đó ta thực hiện tạo ra container sử dụng bind mount để mouting thư mục code `cvt-node` trên máy host với thư mục `app` trên container
+
+![image](https://github.com/user-attachments/assets/ad15d081-f5fc-4b7b-b73a-9e2759196b99)
+
+Trong container ta thực hiện cài đặt `npm install express` như bình thường 
+
+![image](https://github.com/user-attachments/assets/4d3b4e8f-27ea-4f45-bb11-622caad157b8)
+
+Sau đó thực hiện chạy `index.js`
+
+![image](https://github.com/user-attachments/assets/f40daea8-bb42-496c-93cd-fcefb7a44e5c)
