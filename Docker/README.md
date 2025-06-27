@@ -90,6 +90,8 @@ Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường c
 - [3. Ví dụ về Bind Mount](#3-ví-dụ-về-bind-mount)
 - [4. Volume là gì](#4-volume-là-gì)
 - [5. Ví dụ về Volume](#5-ví-dụ-về-volume)
+- [6. Bind mount vs Volume](#6-bind-mount-vs-volume)
+- [7. Utility containers](#7-utility-containers)
 
 <details>
   <summary>Danh sách lệnh</summary>
@@ -1105,4 +1107,71 @@ docker container inspect [container_name] | grep -A 3 Mounts
 ![image](https://github.com/user-attachments/assets/b420df54-8d85-418c-9cfd-6f392d4ee334)
 
 
+**Ví dụ khác**
+
+Ta sẽ tạo ra 1 Dockerfile có nội dung như sau
+
+```Dockerfile
+FROM nginx
+
+VOLUME [ "/data"]
+VOLUME [ "/data2"]
+VOLUME [ "/data3"]
+
+EXPOSE 80
+```
+
+Dùng để tạo ra 1 image có 3 volume là `data`, `data2`, `data3`
+
+![image](https://github.com/user-attachments/assets/f831ad15-a212-4993-ac49-32a9e2dad1c0)
+
+Sau đó ta sẽ thực hiện tạo ra container bằng câu lệnh
+
+```bash
+docker container run --name cvt-nginx -p 81:80 -d -v data1:/data -v data2:/data2 -v data3:/data3 demo-nginx
+```
+
+![image](https://github.com/user-attachments/assets/172d76c3-d50a-47d3-ad38-dfc48e4cbed5)
+
+Như chúng ta có thể thấy giờ container này có 3 volume là `data`, `data2`, `data3`
+
+Bây giờ thực hiện tạo ra 1 container khác mount với volume `data`
+
+```
+docker container run --name cvt-nginx2 -p 82:80 -d -v data1:/data nginx
+```
+
+![image](https://github.com/user-attachments/assets/06bf345e-0164-4d6b-9bed-6dd4356e488e)
+
+![image](https://github.com/user-attachments/assets/060113dc-c9a1-45bf-ae0e-b56e14d2444f)
+
+Như vậy chúng ta có thể hiểu rằng 2 container `cvt-nginx` và `cvt-nginx2` đang sử dụng chung volume `data`, chúng có thể chia sẻ dữ liệu với nhau
+
+![image](https://github.com/user-attachments/assets/0e25c09d-ac7e-4898-b455-cce26113a088)
+
+**Câu hỏi: Bây giờ ta không biết được volume của container trước nằm ở đâu, ta muốn tạo 1 container mới có tất cả volume của container trước đó thì sao?**
+
+Docker đã cung cấp sẵn cho chúng ta 1 option `--volumes-from`
+
+![image](https://github.com/user-attachments/assets/f9d9fbd9-fd09-4fe7-9f0c-075bf87904f5)
+
+Như vậy thì container `cvt-nginx3` sẽ dùng 3 volume `data`, `data2`, `data3` của `cvt-nginx`
+
+![image](https://github.com/user-attachments/assets/d2c78139-8258-4628-bffe-12400d3645c8)
+
+### 6. Bind mount vs Volume
+[:arrow_up: Mục lục](#mục-lục)
+
+| Bind mount | Volume |
+| :---: | :---: |
+| Phụ thuộc vào filesystem của host | Không phụ thuộc vào filesystem của host |
+| Không có driver | Có driver, cho phép lưu data lên cloud, remote host | 
+| Ta lựa chọn thư mục trên host để mount | Docker lựa chọn thư mục trên máy host | 
+| Bind mount được chỉ định khi run command | Volume có thể được chỉ định khi run command hoặc trong Dockerfile |
+| Dữ liệu trong container có thể bị ghi đè khi khởi tạo | Dữ liệu trong container không bị ghi đè khi khởi tạo |
+
+Đối với Bind mount: **Dữ liệu trong container có thể bị ghi đè khi khởi tạo** là một điều không tốt đối với container database. Ví dụ như ta tạo 1 container mysql nếu mà khi bind mount thì data trong mysql có thể bị ghi đè sẽ dẫn đến tính trạng container đó không thể hoạt động được. Do mysql cần có data ban đầu để có thể khởi tạo, trong trường hợp này bắt buộc phải sử dụng volume
+
+### 7. Utility containers
+[:arrow_up: Mục lục](#mục-lục)
 
