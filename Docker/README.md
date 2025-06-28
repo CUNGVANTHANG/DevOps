@@ -1221,3 +1221,47 @@ Sau đó thực hiện chạy `index.js`
 - Trong docker, virtual network cho phép container tương tác với thế giới bên ngoài
 - NAT (Network Address Translation) là quá trình chuyển đổi địa chỉ IP thường là từ Private IP sang Public IP
 
+Công việc NAT thường được diễn ra ở các thiết bị ví dụ như router
+
+Dưới đây là mô phỏng mô hình mạng cơ bản
+
+![image](https://github.com/user-attachments/assets/523525d1-4f79-49c2-bf4e-bef40c0bf5c6)
+
+Còn dưới đây là mô phỏng mô hình mạng trong docker
+
+![image](https://github.com/user-attachments/assets/2ded91dc-121b-4463-8da5-287313d340eb)
+
+NAT ở đây chính là tường lửa ở trên máy tính, thực chất đơn giản là ip table (các quy tắc trong ip table để quy định làm sao các luồng traffic nó có đi được vào trong container này hay không.
+
+_Ví dụ:_ Thông thường chúng ta chạy câu lệnh đơn giản như này để chạy contaienr
+
+```bash
+docker container run -p 80:81 nginx
+```
+
+![image](https://github.com/user-attachments/assets/4fa46500-77e4-4692-b909-e9fa1bf89886)
+
+Thực chất thì docker đã tạo cho chúng ta sẵn 1 mạng network có tên là **brigde network**. Khi mà chúng ta tạo container mà không chỉ định mạng thì mặc định docker sẽ khởi tạo container đó sử dụng mạng **brigde network** này
+
+![image](https://github.com/user-attachments/assets/821e0867-00a1-49b2-b82e-ae4bdafb36c9)
+
+Khi mà container nginx này được tạo ra, thì nó sẽ được cấp 1 địa chỉ ip thuộc dải địa chỉ ip của mạng **brigde network** này. `-p 80:81` ở đây có nghĩa là publish cho phép tất cả traffic vào bên trong cổng 80 trên máy tính rồi nó chuyển đến cổng 80 trên container.
+
+> [!NOTE]
+> - **Default network là bridge network**
+> - **Mặc định, khi tạo container, tất cả port sẽ được private (không public ra ngoài)**
+> - **-p (publish) cho phép bind port của container với port của máy host**
+
+**Liệu chúng ta có thể tạo ra network riêng được không?**
+
+Cú pháp tạo ra network riêng:
+
+```bash
+docker container run -p 81:80 --network custom -d [image_name]
+```
+
+![image](https://github.com/user-attachments/assets/3271b0b9-261b-4d24-bbfb-6835d79035cd)
+
+Chú ý: Không thể sử dụng 2 chương trình trên cùng 1 cổng
+
+
