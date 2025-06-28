@@ -1210,3 +1210,14 @@ Trong container ta thực hiện cài đặt `npm install express` như bình th
 Sau đó thực hiện chạy `index.js`
 
 ![image](https://github.com/user-attachments/assets/f40daea8-bb42-496c-93cd-fcefb7a44e5c)
+
+## IV. Docker network
+[:arrow_up: Mục lục](#mục-lục)
+
+### 1. Các khái niệm cơ bản
+[:arrow_up: Mục lục](#mục-lục)
+
+- Networking là tập hợp các máy tính và các kết nối cho phép các máy tính giao tiếp với nhau
+- Trong docker, virtual network cho phép container tương tác với thế giới bên ngoài
+- NAT (Network Address Translation) là quá trình chuyển đổi địa chỉ IP thường là từ Private IP sang Public IP
+
