@@ -98,6 +98,11 @@ Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường c
 
 | STT | Lệnh | Tác dụng |
 | :--: | :--: | :--: |
+| 1 | [`docker container run -v`](#4-volume-là-gì) | Tạo container có volume |
+| 2 | `docker volume ls` | Liệt kê các volume |
+| 3 | `docker volume inspect [volume_name]` |  Xem thông tin chi tiết của volume | 
+| 4 | `docker volume rm [volume_name]` | Xóa volume có tên là volume_name | 
+| 5 | [`docker container run --volumes-from [container_name]`](#5-ví-dụ-về-volume) | Tạo docker mới có tất cả volume của docker container_name |
 
 </details>
 </details>
