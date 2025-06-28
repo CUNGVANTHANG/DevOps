@@ -1233,7 +1233,7 @@ Còn dưới đây là mô phỏng mô hình mạng trong docker
 
 NAT ở đây chính là tường lửa ở trên máy tính, thực chất đơn giản là ip table (các quy tắc trong ip table để quy định làm sao các luồng traffic nó có đi được vào trong container này hay không.
 
-_Ví dụ:_ Thông thường chúng ta chạy câu lệnh đơn giản như này để chạy contaienr
+_Ví dụ 1:_ Thông thường chúng ta chạy câu lệnh đơn giản như này để chạy contaienr
 
 ```bash
 docker container run -p 80:81 nginx
@@ -1264,4 +1264,80 @@ docker container run -p 81:80 --network custom -d [image_name]
 
 Chú ý: Không thể sử dụng 2 chương trình trên cùng 1 cổng
 
+_Ví dụ 2:_ Thử tạo nghiệm tạo docker network bằng câu lệnh
+
+![image](https://github.com/user-attachments/assets/afe13110-a37f-4b07-91a5-72a5861d5c9f)
+
+Đầu tiên sử dụng câu lệnh tạo docker như bình thường
+
+```bash
+docker container run --name cvt-nginx -p 80:80 -d nginx
+```
+
+![image](https://github.com/user-attachments/assets/8273a34b-1336-4d0a-83c1-f4b5ad5c56fa)
+
+Xong đó kiểm tra bằng cách câu lệnh sau
+
+```bash
+docker network ls
+docker network inspect [network_name]
+```
+
+Chúng ta có thể thấy địa chỉ subnet của mạng bridge network là **172.17.0.0/16** với gateway **172.17.0.1**, container `cvt-nginx` có địa chỉ network là **172.17.0.2/16** thuộc dải địa chỉ của mạng bridge network
+
+Để tạo ra 1 network mới, ta sử dụng câu lệnh
+
+```bash
+docker network create [network_name]
+```
+
+![image](https://github.com/user-attachments/assets/13a2bb35-06cb-4bb0-b270-937f232a0df3)
+
+### 2. Bridge và custom network
+[:arrow_up: Mục lục](#mục-lục)
+
+Để có thể hiểu rõ hơn về phần này, ta có ví dụ sau: Ví dụ này ta tạo ra 2 con container mysql thuộc 2 mạng khác nhau là brigde network và custom network. Xong đó ta sẽ thực hiện ping giữa 2 container nginx và mysql
+
+![image](https://github.com/user-attachments/assets/d6380760-f230-46b9-9788-47b9af9d3716)
+
+Thực hiện 2 lệnh sau để tạo ra 2 container mysql cho 2 mạng bridge và custom network
+
+```bash
+docker container run --name cvt-mysql -e MYSQL_ROOT_PASSWORD=password123 -e MYSQL_DATABASE=db_example -d mysql:8.0
+docker container run --name cvt-mysql-custom -e MYSQL_ROOT_PASSWORD=password123 -e MYSQL_DATABASE=db_example -d --network custom mysql:8.0
+```
+
+![image](https://github.com/user-attachments/assets/9731d328-8c95-4d02-83d8-2c33d94fd9d0)
+
+| Bridge network | Custom network |
+| :--: | :--: |
+| ![image](https://github.com/user-attachments/assets/ef71c38a-007a-430e-b6fb-144d3227ed03) | ![image](https://github.com/user-attachments/assets/c17a1b2c-89a8-43d5-85e5-fc9f2f863ff0) |
+
+Bây giờ ta sẽ đi vào trong container `cvt-nginx` bằng `docker container exec -it cvt-nginx bash`. Xong đó chúng ta cần cài **ping** như sau
+
+```bash
+apt update
+apt upgrade
+apt install iputils-ping
+```
+
+![image](https://github.com/user-attachments/assets/16171d14-5224-442b-a7af-6fd29fadae08)
+
+![image](https://github.com/user-attachments/assets/494e6c23-5a01-4543-ad25-14a21103d08f)
+
+Để có thể ping được thì sử dụng `ping [ip]`
+
+_Ví dụ:_ Ping từ container **cvt-nginx** đến **cvt-mysql**
+
+```
+ping 172.17.0.3
+```
+
+![image](https://github.com/user-attachments/assets/1ce7d30d-a317-4763-a648-1081d70567f9)
+
+Như vậy kết nối từ **cvt-nginx** đến **cvt-mysql** đã được thông
+
+**Vậy kết nối từ **cvt-mysql** đến **cvt-nginx** thì sao**
+
+Làm tương tự ta sẽ đi vào trong container `cvt-mysql` bằng `docker container exec -it cvt-mysql bash`. **Chú ý rằng mysql không sử dụng `apt`, `yum` mà sử dụng `microdnf`**
 
