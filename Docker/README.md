@@ -1341,3 +1341,8 @@ Như vậy kết nối từ **cvt-nginx** đến **cvt-mysql** đã được th�
 
 Làm tương tự ta sẽ đi vào trong container `cvt-mysql` bằng `docker container exec -it cvt-mysql bash`. **Chú ý rằng mysql không sử dụng `apt`, `yum` mà sử dụng `microdnf`**
 
+Ta sử dụng câu lệnh
+
+```
+microdnf install iputils -y
+```
