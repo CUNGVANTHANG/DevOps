@@ -1251,6 +1251,9 @@ Khi mà container nginx này được tạo ra, thì nó sẽ được cấp 1 �
 > - **Default network là bridge network**
 > - **Mặc định, khi tạo container, tất cả port sẽ được private (không public ra ngoài)**
 > - **-p (publish) cho phép bind port của container với port của máy host**
+> - **Container trong cùng network có thể giao tiếp trực tiếp qua các port được exposed (Không cần dùng -p option)**
+> - **Container khác network không thể giao tiếp trực tiếp với nhau**
+> - **Bridge network không cung cấp DNS, custom network có DNS**
 
 **Liệu chúng ta có thể tạo ra network riêng được không?**
 
@@ -1311,7 +1314,7 @@ docker container run --name cvt-mysql-custom -e MYSQL_ROOT_PASSWORD=password123 
 
 | Bridge network | Custom network |
 | :--: | :--: |
-| ![image](https://github.com/user-attachments/assets/ef71c38a-007a-430e-b6fb-144d3227ed03) | ![image](https://github.com/user-attachments/assets/c17a1b2c-89a8-43d5-85e5-fc9f2f863ff0) |
+| ![image](https://github.com/user-attachments/assets/e06c97ac-910c-4860-96ec-5bea7ab2b6de) | ![image](https://github.com/user-attachments/assets/2dd7fd7f-7ed7-4f9f-bf90-13be389372f8) |
 
 Bây giờ ta sẽ đi vào trong container `cvt-nginx` bằng `docker container exec -it cvt-nginx bash`. Xong đó chúng ta cần cài **ping** như sau
 
@@ -1330,10 +1333,10 @@ apt install iputils-ping
 _Ví dụ:_ Ping từ container **cvt-nginx** đến **cvt-mysql**
 
 ```
-ping 172.17.0.3
+ping 172.17.0.2
 ```
 
-![image](https://github.com/user-attachments/assets/1ce7d30d-a317-4763-a648-1081d70567f9)
+![image](https://github.com/user-attachments/assets/4ed315c4-6ac0-4a8a-9f21-c14b58ebfab9)
 
 Như vậy kết nối từ **cvt-nginx** đến **cvt-mysql** đã được thông
 
@@ -1346,3 +1349,55 @@ Ta sử dụng câu lệnh
 ```
 microdnf install iputils -y
 ```
+
+_Ví dụ:_ Ping từ container **cvt-mysql** đến **cvt-nginx**
+
+```
+ping 172.17.0.3
+```
+
+![image](https://github.com/user-attachments/assets/5172fdf8-b15d-4b79-8372-76115a0f8369)
+
+Như vậy kết nối từ **cvt-mysql** đến **cvt-nginx** đã được thông
+
+_Ví dụ:_ Ping từ container **cvt-nginx** đến **cvt-mysql** sử dụng tên của container có được không?
+
+![image](https://github.com/user-attachments/assets/2e64c2f6-d96d-4aeb-bd89-d61b16fd5432)
+
+Như chúng ta có thể thấy ta không thể `ping [name_container]` vậy thì có cách nào giúp ta làm được điều đó không?
+
+Có, trong quá trình tạo container ta cần thêm 1 option là `--link` 
+
+```bash
+docker container run --name cvt-nginx2 -p 83:80 -d --link cvt-mysql nginx
+```
+
+Xong đó sử dụng `docker network inspect bridge` để kiểm tra
+
+![image](https://github.com/user-attachments/assets/95598251-16e2-413f-b352-6f7ebe179c3c)
+
+Tương tự chúng ta sẽ vào container `cvt-nginx2` để thực hiện ping
+
+![image](https://github.com/user-attachments/assets/0c82451e-9afb-4b47-b097-af3066d62b9c)
+
+Như vậy kết nối từ **cvt-nginx2** đến **cvt-mysql** đã được thông
+
+**Tương tự như bridge network thì custom network cũng sẽ làm được như vậy, nhưng custom network sẽ có thêm DNS (ping [name_container]) mà không cần ping dựa vào địa chỉ ip**
+
+_Ví dụ:_ Ping từ container **cvt-nginx-custom** đến **cvt-mysql-custom**
+
+```
+ping 172.18.0.2
+```
+
+hoặc 
+
+```
+ping cvt-mysql-custom
+```
+
+![image](https://github.com/user-attachments/assets/40c6377e-abd6-45a4-87e4-fa5bdcb9eb68)
+
+Như vậy kết nối từ **cvt-nginx-custom** đến **cvt-mysql-custom** đã được thông
+
+
