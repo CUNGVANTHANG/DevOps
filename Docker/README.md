@@ -110,6 +110,9 @@ Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường c
 <details>
   <summary>Docker network</summary>
 
+- [1. Các khái niệm cơ bản](#1-các-khái-niệm-cơ-bản)
+- [2. Bridge và custom network](#2-bridge-và-custom-network)
+- [3. Host network](#3-host-network)
 <details>
   <summary>Danh sách lệnh</summary>
 
@@ -1254,6 +1257,8 @@ Khi mà container nginx này được tạo ra, thì nó sẽ được cấp 1 �
 > - **Container trong cùng network có thể giao tiếp trực tiếp qua các port được exposed (Không cần dùng -p option)**
 > - **Container khác network không thể giao tiếp trực tiếp với nhau**
 > - **Bridge network không cung cấp DNS, custom network có DNS**
+> - **Host network gắn port container trực tiếp vào port của host, bỏ qua NAT firewall**
+> - **Host network có lợi về performance nhưng rủi ro về security**
 
 **Liệu chúng ta có thể tạo ra network riêng được không?**
 
@@ -1399,5 +1404,30 @@ ping cvt-mysql-custom
 ![image](https://github.com/user-attachments/assets/40c6377e-abd6-45a4-87e4-fa5bdcb9eb68)
 
 Như vậy kết nối từ **cvt-nginx-custom** đến **cvt-mysql-custom** đã được thông
+
+> [!NOTE]
+> - **Container trong cùng network có thể giao tiếp trực tiếp qua các port được exposed (Không cần dùng -p option)**
+> - **Container khác network không thể giao tiếp trực tiếp với nhau**
+> - **Bridge network không cung cấp DNS, custom network có DNS**
+
+### 3. Host network
+[:arrow_up: Mục lục](#mục-lục)
+
+![image](https://github.com/user-attachments/assets/90c154f8-9600-4207-b311-bc229af2d844)
+
+**Host network** có phép ta chạy các container gắn trực tiếp vào các port vật lý ở trên máy tính, nó sẽ không thông qua mạng trung gian như **bridge network** hay **custom network** nữa. 
+
+Sử dụng câu lệnh
+
+```bash
+docker container run --network host [name_image]
+```
+
+![image](https://github.com/user-attachments/assets/40c23b52-a585-4b90-9e24-9c90fbcbd6a4)
+
+> [!NOTE]
+> - **Host network gắn port container trực tiếp vào port của host, bỏ qua NAT firewall**
+> - **Host network có lợi về performance nhưng rủi ro về security**
+
 
 
