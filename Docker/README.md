@@ -1410,6 +1410,8 @@ Như vậy kết nối từ **cvt-nginx-custom** đến **cvt-mysql-custom** đ�
 > - **Container khác network không thể giao tiếp trực tiếp với nhau**
 > - **Bridge network không cung cấp DNS, custom network có DNS**
 
+> Sử dụng custom network cho từng nhóm application để có DNS và tăng bảo mật
+
 ### 3. Host network
 [:arrow_up: Mục lục](#mục-lục)
 
@@ -1429,5 +1431,57 @@ docker container run --network host [name_image]
 > - **Host network gắn port container trực tiếp vào port của host, bỏ qua NAT firewall**
 > - **Host network có lợi về performance nhưng rủi ro về security**
 
+### 3. None network
+[:arrow_up: Mục lục](#mục-lục)
+
+![image](https://github.com/user-attachments/assets/682c6cb2-e3b5-4f06-88e7-e36fcd829f7e)
+
+Ngoài bridge network, custom network, host network thì còn có none network. Trong none network các container hoạt động độc lập nhau và chúng không có bất kỳ kết nối với nhau.
+
+### 4. Connect và disconnect container
+[:arrow_up: Mục lục](#mục-lục)
+
+Câu hỏi là bây giờ 2 mạng và 1 container nginx, yêu cầu nếu request đi vào nginx thì request đấy có thể được đẩy vào 1 trong 2 mạng thì làm như thế nào?
+
+![image](https://github.com/user-attachments/assets/3a199674-303c-4d5a-ac2f-853e75d118a1)
+
+Ta sẽ sử dụng câu lệnh như sau để 1 container có thể thuộc 2 mạng
+
+```bash
+docker network connect [name_network] [name_container]
+```
+
+Ta khởi tạo 1 container thuộc custom network
+
+![image](https://github.com/user-attachments/assets/257ff910-56ce-49b9-ba41-e58c058ba000)
+
+Kết quả:
+
+| Bridge network | Custom network |
+| :--: | :--: |
+| ![image](https://github.com/user-attachments/assets/7b76eabd-34c4-4b76-ae00-63a198f69c97) | ![image](https://github.com/user-attachments/assets/a30f4cf3-8ef0-417d-9046-3aa7732047c7) | 
+
+Như chúng ta có thể thấy container nginx thuộc 2 mạng bridge và custom network
+
+**Vậy làm sao để nginx disconnect với custom network**
+
+```bash
+docker network disconnect [name_network] [name_container]
+```
+
+![image](https://github.com/user-attachments/assets/562bd1f1-9925-4ff3-9c32-f71934d63c88)
+
+Chúng ta có thể thấy container nginx không còn thuộc mạng custom network nữa
+
+### 4. Network alias
+[:arrow_up: Mục lục](#mục-lục)
+
+Để sử dụng network alias ta dùng option `--network-alias`
+
+_Ví dụ:_
+
+```
+docker container run -d --rm --network custom --network-alias search elasticsearch:2
+```
 
 
