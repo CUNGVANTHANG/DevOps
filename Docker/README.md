@@ -113,6 +113,11 @@ Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường c
 - [1. Các khái niệm cơ bản](#1-các-khái-niệm-cơ-bản)
 - [2. Bridge và custom network](#2-bridge-và-custom-network)
 - [3. Host network](#3-host-network)
+- [4. None network](#4-none-network)
+- [5. Connect và disconnect container](#5-connect-và-disconnect-container)
+- [6. Network alias](#6-network-alias)
+- [7. Tổng kết](#7-tổng-kết)
+
 <details>
   <summary>Danh sách lệnh</summary>
 
@@ -1431,14 +1436,14 @@ docker container run --network host [name_image]
 > - **Host network gắn port container trực tiếp vào port của host, bỏ qua NAT firewall**
 > - **Host network có lợi về performance nhưng rủi ro về security**
 
-### 3. None network
+### 4. None network
 [:arrow_up: Mục lục](#mục-lục)
 
 ![image](https://github.com/user-attachments/assets/682c6cb2-e3b5-4f06-88e7-e36fcd829f7e)
 
 Ngoài bridge network, custom network, host network thì còn có none network. Trong none network các container hoạt động độc lập nhau và chúng không có bất kỳ kết nối với nhau.
 
-### 4. Connect và disconnect container
+### 5. Connect và disconnect container
 [:arrow_up: Mục lục](#mục-lục)
 
 Câu hỏi là bây giờ 2 mạng và 1 container nginx, yêu cầu nếu request đi vào nginx thì request đấy có thể được đẩy vào 1 trong 2 mạng thì làm như thế nào?
@@ -1473,7 +1478,7 @@ docker network disconnect [name_network] [name_container]
 
 Chúng ta có thể thấy container nginx không còn thuộc mạng custom network nữa
 
-### 4. Network alias
+### 6. Network alias
 [:arrow_up: Mục lục](#mục-lục)
 
 Để sử dụng network alias ta dùng option `--network-alias`
@@ -1494,7 +1499,7 @@ Network alias cho phép ta nhóm các container vào trong cùng 1 cái tên. Gi
 
 Như chúng ta có thể thấy request khi mà đến nó sẽ được phân bổ ngẫu nhiên tới container
 
-### 5. Tổng kết
+### 7. Tổng kết
 [:arrow_up: Mục lục](#mục-lục)
 
 ![image](https://github.com/user-attachments/assets/de56c6b4-4c42-447f-881e-9fb281e56d13)
@@ -1506,7 +1511,34 @@ Như chúng ta có thể thấy request khi mà đến nó sẽ được phân b
 - Host network gắn trực tiếp container lên network interface của máy host (bỏ qua NAT)
 - Sử dụng custom bridge network cho từng nhóm application để có DNS và tăng bảo mật
 
+## V. Docker compose
+### 1. Docker compose là gì
+[:arrow_up: Mục lục](#mục-lục)
 
+- Là công cụ dùng để run nhiều container cùng một lúc chỉ bằng một câu lệnh
+- Nó dùng file YAML để định nghĩa service (mỗi service tương ứng với 1 container)
+- Là tool giúp tiết kiệm thời gian bằng việc document cấu hình các container
+- Hỗ trợ mọi chức năng mà docker client có
+
+Dưới đây là 1 template của docker compose
+
+![image](https://github.com/user-attachments/assets/f94c5256-8ec7-43f0-b11c-9251ebfcc087)
+
+```yaml
+version: "3.8"
+
+services:
+  service_name:
+    image:
+    command:
+    environment:
+    volumes:
+  service_name2:
+
+volumes:
+
+networks:
+```
 
 
 
