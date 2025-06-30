@@ -1484,4 +1484,29 @@ _Ví dụ:_
 docker container run -d --rm --network custom --network-alias search elasticsearch:2
 ```
 
+![image](https://github.com/user-attachments/assets/917f37e6-ade1-4993-8f3d-b7093ddee00e)
+
+Network alias cho phép ta nhóm các container vào trong cùng 1 cái tên. Giống ví dụ trên ta tạo ra nhiều container với 1 tên duy nhất là search
+
+Để kiểm chứng được thì ta sẽ đi vào 1 container khác rồi gọi đến container search đó
+
+![image](https://github.com/user-attachments/assets/e968e7cd-ab1b-4a19-901c-624543f059c7)
+
+Như chúng ta có thể thấy request khi mà đến nó sẽ được phân bổ ngẫu nhiên tới container
+
+### 5. Tổng kết
+[:arrow_up: Mục lục](#mục-lục)
+
+![image](https://github.com/user-attachments/assets/de56c6b4-4c42-447f-881e-9fb281e56d13)
+
+- Network cho phép container giao tiếp với thế giới bên ngoài. Container khác network không thể giao tiếp được với nhau
+- Bridge, custom bridge, host. Default là bridge network
+- Bridge cho phép dữ liệu ra container được NATed (private IP thành public IP)
+- Custom bridge có cung cấp DNS, default bridge không có DNS (sử dụng --link để thay thế)
+- Host network gắn trực tiếp container lên network interface của máy host (bỏ qua NAT)
+- Sử dụng custom bridge network cho từng nhóm application để có DNS và tăng bảo mật
+
+
+
+
 
