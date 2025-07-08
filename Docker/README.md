@@ -1547,5 +1547,36 @@ volumes:
 networks:
 ```
 
+_Ví dụ:_ Tạo 1 container nginx bằng docker compose
 
+![image](https://github.com/user-attachments/assets/dfd996e3-bfbb-44f5-8f8a-321ba5a775b3)
 
+Ta sử dụng câu lệnh
+
+```
+docker compose up
+```
+
+> [!NOTE]
+> - **Chuyện gì sẽ xảy ra khi ta chạy câu lệnh `docker compose up`?**
+> - Một custom network được tạo
+> - Các container sẽ được start
+> - Log của các container sẽ được live trực tiếp
+> - Khi exit command, tất cả container sẽ bị stopped
+> - Sử dụng `-d` option để run container dưới background
+
+![image](https://github.com/user-attachments/assets/13ea0b63-1a40-43d5-8405-d1f1ef59edda)
+
+Ngoài ra chúng ta có thể sử dụng câu lệnh `docker compose logs` để xem log của container
+
+```
+docker compose logs
+```
+
+Việc chúng ta không sử dụng docker compose như chúng ta có thể xem 1 số ví dụ ở dưới đây:
+
+![image](https://github.com/user-attachments/assets/f516b7ee-22e8-43ef-9c53-9c8e98b6a80d)
+
+![image](https://github.com/user-attachments/assets/f0c57222-75bf-4d3f-89de-60648aa1b907)
+
+Nếu không sử dụng docker compose thì ta sẽ phải gõ lệnh rất nhiều và không tối ưu cho những lần thay đổi tiếp theo
