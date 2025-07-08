@@ -1,5 +1,8 @@
-## Docker
+![image](https://github.com/user-attachments/assets/3b755218-88f9-42fc-8f6f-bed16affb9dd)# Docker
 
+<div align="center">
+<img src="https://github.com/user-attachments/assets/beb7c53d-c494-4750-a911-7da151df0076" >
+</div>
 Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường chạy (như Node, Python, DB, OS...) vào một "hộp" gọi là container, để:
 
 👉 Chạy ở đâu cũng được, không lo lệch môi trường giữa máy dev, test, hay production.
@@ -1580,3 +1583,142 @@ Việc chúng ta không sử dụng docker compose như chúng ta có thể xem 
 ![image](https://github.com/user-attachments/assets/f0c57222-75bf-4d3f-89de-60648aa1b907)
 
 Nếu không sử dụng docker compose thì ta sẽ phải gõ lệnh rất nhiều và không tối ưu cho những lần thay đổi tiếp theo
+
+### 2. Ví dụ thực tế sử dụng docker compose
+[:arrow_up: Mục lục](#mục-lục)
+
+_Ví dụ 1:_ Tạo 1 docker compose với 2 application là mysql và wordpress. Với điều kiện là mysql được sử dụng để lưu trữ dữ liệu wordpress
+
+```yml
+version: "3.8"
+
+services:
+  cvt-mysql:
+    image: "mysql:8.0"
+    environment:
+      MYSQL_ROOT_PASSWORD: password123
+      MYSQL_DATABASE: db_example
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  cvt-app:
+    image: "wordpress:latest"
+    environment:
+      WORDPRESS_DB_HOST: cvt-mysql
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: password123
+      WORDPRESS_DB_NAME: db_example
+    ports:
+      - "8080:80"
+    volumes:
+      - app-data:/var/www/html
+    depends_on:
+      - cvt-mysql
+
+volumes:
+  mysql-data:
+  app-data:
+```
+
+**Giải thích:**
+
+- `cvt-mysql` – Service MySQL
+
+```yml
+    environment:
+      MYSQL_ROOT_PASSWORD: password123
+      MYSQL_DATABASE: db_example
+```
+
+Thiết lập biến môi trường cho container MySQL:
+
+`MYSQL_ROOT_PASSWORD`: mật khẩu cho user root.
+
+`MYSQL_DATABASE`: tên database sẽ tự động được tạo khi container khởi động lần đầu.
+
+- `cvt-app` – Service WordPress
+
+```yml
+    environment:
+      WORDPRESS_DB_HOST: cvt-mysql
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: password123
+      WORDPRESS_DB_NAME: db_example
+```
+
+Các biến môi trường cấu hình kết nối tới database MySQL:
+
+`WORDPRESS_DB_HOST`: tên service `cvt-mysql` (vì các container có thể gọi nhau qua tên service trong cùng một Docker network).
+
+`WORDPRESS_DB_USER`: tên người dùng (ở đây dùng root).
+
+`WORDPRESS_DB_PASSWORD`: mật khẩu tương ứng với user.
+
+`WORDPRESS_DB_NAME`: tên cơ sở dữ liệu.
+
+Chú ý:
+
+```yml
+    depends_on:
+      - cvt-mysql
+```
+
+Đảm bảo rằng MySQL container khởi chạy trước WordPress (cần DB trước khi app chạy). Nghĩa là MySQL phải được chạy trước, rồi mới khởi động wordpress rồi connect với mysql tránh tình trạng wordpress được khởi động nhưng không có connect với database
+
+![image](https://github.com/user-attachments/assets/43195535-88a3-4e9d-a7a5-135dfe81ff1f)
+
+Chúng ta cũng có thể làm như này để tối ưu hơn bằng cách tạo ra file `.env-app`
+
+```env
+WORDPRESS_DB_HOST=cvt-mysql
+WORDPRESS_DB_USER=root
+WORDPRESS_DB_PASSWORD=password123
+WORDPRESS_DB_NAME=db_example
+```
+
+```yml
+version: "3.8"
+
+services:
+  cvt-mysql:
+    image: "mysql:8.0"
+    environment:
+      MYSQL_ROOT_PASSWORD: password123
+      MYSQL_DATABASE: db_example
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  cvt-app:
+    image: "wordpress:latest"
+    env-file: .env-app
+    ports:
+      - "8080:80"
+    volumes:
+      - app-data:/var/www/html
+    depends_on:
+      - cvt-mysql
+
+volumes:
+  mysql-data:
+  app-data:
+```
+
+![image](https://github.com/user-attachments/assets/00ab4fc1-46e7-41b8-926a-24ea36cbcff8)
+
+Trong trường hợp 1 thư mục có nhiều file `.yml` ta có thể thực hiện sử dụng option `-f` như sau
+
+```
+docker compose -f compose2.yml up -d
+```
+
+![image](https://github.com/user-attachments/assets/6d34dc50-513d-4b1c-af42-9ca60c090e1b)
+
+Để xóa compose (stop container và xóa container) thì ta sử dụng câu lệnh sau: (Trong đó `-v` là option thêm để xóa cả volume mà container đó có)
+
+```
+docker compose -f compose2.yml down -v
+```
+
+
+
+
