@@ -123,6 +123,12 @@ Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường c
 
 | STT | Lệnh | Tác dụng |
 | :--: | :--: | :--: |
+| 1 | `docker network ls` | Liệt kê các network |
+| 2 | `docker network inspect [network_name]` | Xem thông tin chi tiết của network | 
+| 3 | `docker network create [network_name]` | Tạo network |
+| 4 | `docker container run --network host [name_image]` | Tạo host network |
+| 5 | `docker network connect [name_network] [name_container]` | Connect container với network |
+| 6 | `docker network disconnect [name_network] [name_container]` | Disconnect container trong network | 
 
 </details>
 </details>
@@ -130,6 +136,7 @@ Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường c
 <details>
   <summary>Docker compose</summary>
 
+- [1. Docker compose là gì](#1-docker-compose-là-gì)
 <details>
   <summary>Danh sách lệnh</summary>
 
