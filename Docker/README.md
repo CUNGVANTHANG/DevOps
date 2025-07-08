@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/3b755218-88f9-42fc-8f6f-bed16affb9dd)# Docker
+# Docker
 
 <div align="center">
 <img src="https://github.com/user-attachments/assets/beb7c53d-c494-4750-a911-7da151df0076" >
@@ -1720,5 +1720,8 @@ docker compose -f compose2.yml down -v
 ```
 
 
+_Ví dụ 2:_ Tạo ra 1 cụm application bao gồm nginx đóng vai trò là web server, 2 con app nodejs và spring boot, 1 database là mysql
+
+<img src="https://github.com/user-attachments/assets/b76ad135-7e74-4de5-aca8-f03c2645efef" height="300px" >
 
 
