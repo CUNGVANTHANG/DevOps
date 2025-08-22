@@ -142,11 +142,15 @@ Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường c
 - [1. Docker compose là gì](#1-docker-compose-là-gì)
 - [2. Ví dụ thực tế sử dụng docker compose](#2-ví-dụ-thực-tế-sử-dụng-docker-compose)
 - [3. Health check container](#3-health-check-container)
+- [4. Restart policy](#4-restart-policy)
 <details>
   <summary>Danh sách lệnh</summary>
 
 | STT | Lệnh | Tác dụng |
 | :--: | :--: | :--: |
+| 1 | `docker compose up -d` | Tạo các container dựa vào `docker-compose.yml` | 
+| 2 | `docker compose down -v` | Xóa các container vừa tạo với `docker-compose.yml` |
+| 3 | `docker compose -f [name_compose].yml up -d` | Tạo các container dựa vào file chỉ định `[name_compose].yml` (nếu trong thư mục có nhiều file `compose.yml`) | 
 
 </details>
 </details>
@@ -2060,3 +2064,96 @@ Xong thực hiện get dữ liệu
 Tiếp tục đến với api `http://localhost:80/java/add`
 
 <img width="600" alt="image" src="https://github.com/user-attachments/assets/959b6b69-b1f8-4900-9dda-f96e83349caa" />
+
+### 4. Restart policy
+[:arrow_up: Mục lục](#mục-lục)
+
+Restart policy là việc quản lý cách container được restart
+
+- no (default)
+- always: luôn restart container, trừ khi container bị stop bằng tay, lúc đó cần chờ docker daemon restart thì mới restart lại container được
+- on-failure: chỉ restart khi chương trình bị lỗi và exit
+- unless-stopped: tương tự always, chỉ khác là không restart container kể cả khi daemon restart
+
+Tiếp tục với [Ví dụ 2](#ví-dụ-2) ở trên, ta có thể sử dụng restart thay cho health check như sau
+
+```yaml
+version: "3"
+
+services:
+  nginx:
+    image: "nginx:latest"
+    ports:
+      - "80:80"
+    configs:
+      - source: default.conf
+        target: /etc/nginx/conf.d/default.conf
+    networks:
+      - app
+    depends_on:
+      - springboot
+      - node
+    restart: on-failure
+  springboot:
+    build:
+      context: ./springboot
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
+    networks:
+      - app
+    depends_on:
+      - mysql
+    restart: on-failure
+  node:
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    ports:
+      - "8080:3000"
+    networks:
+      - app
+    depends_on:
+      - mysql
+    restart: on-failure
+  mysql:
+    image: "mysql:8.0"
+    environment:
+      MYSQL_ROOT_PASSWORD: password123_ABC
+      MYSQL_DATABASE: db_example
+      MYSQL_USER: khalid
+      MYSQL_PASSWORD: password123_ABC
+    command: --init-file /my-config
+    configs:
+      - source: my-config
+        target: /my-config
+    volumes:
+      - mysql-data:/var/lib/mysql
+    # healthcheck:
+    #   test:
+    #     [
+    #       "CMD-SHELL",
+    #       "mysqladmin ping -h localhost -u root -p$MYSQL_ROOT_PASSWORD || exit 1",
+    #     ]
+    #   interval: 1s
+    #   retries: 3
+    #   start_period: 25s
+    networks:
+      - app
+
+volumes:
+  mysql-data:
+configs:
+  my-config:
+    file: ./node/my-config
+  default.conf:
+    file: ./nginx/default.conf
+networks:
+  app:
+    name: app
+
+```
+
+Kết quả:
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/5bebafa1-802f-47cd-8f9f-943947d346bd" />
