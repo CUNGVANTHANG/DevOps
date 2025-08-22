@@ -141,6 +141,7 @@ Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường c
 
 - [1. Docker compose là gì](#1-docker-compose-là-gì)
 - [2. Ví dụ thực tế sử dụng docker compose](#2-ví-dụ-thực-tế-sử-dụng-docker-compose)
+- [3. Health check container](#3-health-check-container)
 <details>
   <summary>Danh sách lệnh</summary>
 
@@ -1816,4 +1817,17 @@ Thông số:
 - interval: Khoảng thời gian giữa 2 lần health check (default 30s)
 - timeout: Khoảng thời gian tối đa cho 1 lần health check trả về kết quả. Nếu quá thời gian này, kết quả trả về là failure (default 30s)
 - retries: Số lần failure tối đa được phép xảy ra khi container bị chuyển thành unhealthy (default 3)
+- start-period: Khoảng thời gian cho việc start app. Trong thời gian này, nếu failure thì sẽ không bị tính vào số lần retries (default 0s)
+- start-interval: Khoảng thời gian giữa các lần health check trong start-period
 
+Hoạt động như sau: 
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/bb023139-723e-4973-b8d3-9db7fdd5d3b5" />
+
+Trong khoảng thời gian container started - successfully started (Khoảng thời gian này là khoảng gian container khởi động những chưa sẵn sàng làm việc) thì health check sẽ check ra được là failure
+
+Dĩ nhiên sau khoảng thời gian này healthy check sẽ check ra được success hoặc failure của container biết được container đó có unhealthy hay không
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/aee06edb-5743-4f20-861a-45d0c57e610a" />
+
+Như chúng ta có thể thấy sau khi successfully started thì nếu mà container bị failure thì sẽ bị tính vào 1 lần retries, khi mà retries về 0 chứng tỏ container này là unhealthy
