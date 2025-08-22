@@ -140,6 +140,7 @@ Docker là công cụ giúp bạn đóng gói ứng dụng kèm môi trường c
   <summary>Docker compose</summary>
 
 - [1. Docker compose là gì](#1-docker-compose-là-gì)
+- [2. Ví dụ thực tế sử dụng docker compose](#2-ví-dụ-thực-tế-sử-dụng-docker-compose)
 <details>
   <summary>Danh sách lệnh</summary>
 
@@ -1724,4 +1725,95 @@ _Ví dụ 2:_ Tạo ra 1 cụm application bao gồm nginx đóng vai trò là w
 
 <img src="https://github.com/user-attachments/assets/b76ad135-7e74-4de5-aca8-f03c2645efef" height="300px" >
 
+_Cấu trúc thư mục và file:_
+
+Đầu tiên là thư mục `node` nơi lưu trữ source code về nodejs, có Dockerfile như sau:
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/c558893d-9d4c-4926-a7e5-47b9ff4997fb" />
+
+Ngoài ra trong `index.js` ta cũng có tạo 1 kết nối đến database mysql như dưới đây
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/f30248b8-8054-4083-b263-8eb0d1c57661" />
+
+Tương tự cấu trúc thư mục `springboot` cũng có `application.properties` tạo kết nối đến database mysql như dưới dây
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/cbbad568-364b-4da5-afb4-53743d13b511" />
+
+Trong thư mục `nginx` có file `default.conf` dùng để config webserver. Trong đây có 2 khối quan trọng là java sẽ trỏ đến springboot và node sẽ trỏ đến nodejs dùng chỉ định request sẽ đi vào 2 khối này
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/bcf1c404-9f8b-4572-a713-e8db1b1b190c" />
+
+_Bắt đầu viết compose.yml_
+
+```yaml
+version: "3"
+
+services:
+  node:
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    ports:
+      - "8080:3000"
+    networks:
+      - app
+    depends_on:
+      - mysql
+  mysql:
+    image: "mysql:8.0"
+    environment:
+      MYSQL_ROOT_PASSWORD: password123_ABC
+      MYSQL_DATABASE: db_example
+      MYSQL_USER: khalid
+      MYSQL_PASSWORD: password123_ABC
+    configs:
+      - source: my-config
+        target: /my-config
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - app
+
+volumes:
+  mysql-data:
+configs:
+  my-config:
+    file: ./node/my-config
+networks:
+  app:
+    name: app
+```
+
+Trong đó lưu ý:
+
+- `depends_on`: đảm bảo Node chỉ start sau khi service mysql đã start (nhưng không đảm bảo MySQL sẵn sàng – chỉ đảm bảo container chạy).
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/7885b890-9c5d-4b90-a8ff-dddd9e7332bd" />
+
+_Kết quả:_
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/49d21816-12b0-46a6-ac05-eabbe42706de" />
+
+Chúng ta nhận thấy 1 vấn đề như sau, container nodejs đã bị exit
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/257cfcbd-5280-4967-8107-9496b7a33075" />
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/4c70119f-893a-49e3-83d1-ec8fb8f944b6" />
+
+Đây là 1 lỗi connection ở nodejs, nghĩa là khi mà container mysql được khởi động thì container mysql vẫn chưa sẵn sàng để nhận kết nối với các application khác, trong khi đó container nodejs thì đã bắt đầu kết nối với mysql dẫn đến tình trạng này
+
+Giải pháp bây giờ chúng ta cần phải có cơ chế kiểm tra xem mysql đã sẵn sàng nhận kết nối với các application khác chưa. Giải pháp đó người ta gọi là **health check**
+
+### 3. Health check container
+[:arrow_up: Mục lục](#mục-lục)
+
+Health check container là việc đánh giá container có hoạt động đúng như mong muốn hay không. Nếu có vấn đề gì thì nhanh chóng phát thông báo 
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/837d494e-b289-4672-8111-266c16c781ce" />
+
+Thông số:
+
+- interval: Khoảng thời gian giữa 2 lần health check (default 30s)
+- timeout: Khoảng thời gian tối đa cho 1 lần health check trả về kết quả. Nếu quá thời gian này, kết quả trả về là failure (default 30s)
+- retries: Số lần failure tối đa được phép xảy ra khi container bị chuyển thành unhealthy (default 3)
 
