@@ -1721,6 +1721,7 @@ docker compose -f compose2.yml up -d
 docker compose -f compose2.yml down -v
 ```
 
+### Ví dụ 2
 
 _Ví dụ 2:_ Tạo ra 1 cụm application bao gồm nginx đóng vai trò là web server, 2 con app nodejs và spring boot, 1 database là mysql
 
@@ -1831,3 +1832,231 @@ Dĩ nhiên sau khoảng thời gian này healthy check sẽ check ra được su
 <img width="600" alt="image" src="https://github.com/user-attachments/assets/aee06edb-5743-4f20-861a-45d0c57e610a" />
 
 Như chúng ta có thể thấy sau khi successfully started thì nếu mà container bị failure thì sẽ bị tính vào 1 lần retries, khi mà retries về 0 chứng tỏ container này là unhealthy
+
+Chúng ta sẽ vẫn bắt đầu với ví dụ 2 ở phía trên:
+
+[Ví dụ 2](#ví-dụ-2)
+
+```yaml
+version: "3"
+
+services:
+  node:
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    ports:
+      - "8080:3000"
+    networks:
+      - app
+    depends_on:
+      mysql:
+        condition: service_healthy
+  mysql:
+    image: "mysql:8.0"
+    environment:
+      MYSQL_ROOT_PASSWORD: password123_ABC
+      MYSQL_DATABASE: db_example
+      MYSQL_USER: khalid
+      MYSQL_PASSWORD: password123_ABC
+    configs:
+      - source: my-config
+        target: /my-config
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -u root -p$MYSQL_ROOT_PASSWORD || exit 1",
+        ]
+      interval: 1s
+      retries: 3
+      start_period: 25s
+    networks:
+      - app
+
+volumes:
+  mysql-data:
+configs:
+  my-config:
+    file: ./node/my-config
+networks:
+  app:
+    name: app
+```
+
+Trong đó
+
+- `healthcheck`: kiểm tra container MySQL có healthy chưa.
+- `depends_on`: chỉ khởi chạy node sau khi service mysql có trạng thái healthy (theo healthcheck ở dưới).
+
+Kết quả:
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/6aa19c3d-bc33-4521-9a29-0552132e754a" />
+
+Tiếp tục với [Ví dụ 2](#ví-dụ-2) ở trên
+
+```yaml
+version: "3"
+
+services:
+  springboot:
+    build:
+      context: ./springboot
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
+    networks:
+      - app
+    depends_on:
+      mysql:
+        condition: service_healthy
+  node:
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    ports:
+      - "8080:3000"
+    networks:
+      - app
+    depends_on:
+      mysql:
+        condition: service_healthy
+  mysql:
+    image: "mysql:8.0"
+    environment:
+      MYSQL_ROOT_PASSWORD: password123_ABC
+      MYSQL_DATABASE: db_example
+      MYSQL_USER: khalid
+      MYSQL_PASSWORD: password123_ABC
+    configs:
+      - source: my-config
+        target: /my-config
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -u root -p$MYSQL_ROOT_PASSWORD || exit 1",
+        ]
+      interval: 1s
+      retries: 3
+      start_period: 25s
+    networks:
+      - app
+
+volumes:
+  mysql-data:
+configs:
+  my-config:
+    file: ./node/my-config
+networks:
+  app:
+    name: app
+```
+
+Kết quả:
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/8848308a-46e4-4e14-9120-16a493d5670f" />
+
+Tiếp đến chúng ta cần tạo ra webserver sử dụng nginx
+
+```yaml
+version: "3"
+
+services:
+  nginx:
+    image: "nginx:latest"
+    ports:
+      - "80:80"
+    configs:
+      - source: default.conf
+        target: /etc/nginx/conf.d/default.conf
+    networks:
+      - app
+    depends_on:
+      - springboot
+      - node
+
+  springboot:
+    build:
+      context: ./springboot
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
+    networks:
+      - app
+    depends_on:
+      mysql:
+        condition: service_healthy
+  node:
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    ports:
+      - "8080:3000"
+    networks:
+      - app
+    depends_on:
+      mysql:
+        condition: service_healthy
+  mysql:
+    image: "mysql:8.0"
+    environment:
+      MYSQL_ROOT_PASSWORD: password123_ABC
+      MYSQL_DATABASE: db_example
+      MYSQL_USER: khalid
+      MYSQL_PASSWORD: password123_ABC
+    command: --init-file /my-config
+    configs:
+      - source: my-config
+        target: /my-config
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -u root -p$MYSQL_ROOT_PASSWORD || exit 1",
+        ]
+      interval: 1s
+      retries: 3
+      start_period: 25s
+    networks:
+      - app
+
+volumes:
+  mysql-data:
+configs:
+  my-config:
+    file: ./node/my-config
+  default.conf:
+    file: ./nginx/default.conf
+networks:
+  app:
+    name: app
+```
+
+Kết quả:
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/96605ace-4117-4c6c-abe7-c633a3afcc60" />
+
+Bây giờ chúng ta sẽ thực hiện test api với webserver `http://localhost:80`
+
+Đầu tiên với api `http://localhost:80/node` chúng ta có thể thấy hiện tại database chưa có dữ liệu, nhưng kết quả trả về là 200 cho thấy server đã hoạt động 
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/9c3cbe61-529e-4b18-927d-92fcbbbbb082" />
+
+Bây giờ ta sẽ thực hiện thêm dữ liệu vào 
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/1aa2aed4-1f82-4b83-913c-ecfc21ad4fdb" />
+
+Xong thực hiện get dữ liệu
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/d0160fda-c56c-4bb9-8524-a4ed1f5be63f" />
+
+Tiếp tục đến với api `http://localhost:80/java/add`
+
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/959b6b69-b1f8-4900-9dda-f96e83349caa" />
