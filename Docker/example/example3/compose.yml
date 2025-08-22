@@ -1,0 +1,73 @@
+version: "3"
+
+services:
+  nginx:
+    image: "nginx:latest"
+    ports:
+      - "80:80"
+    configs:
+      - source: default.conf
+        target: /etc/nginx/conf.d/default.conf
+    networks:
+      - app
+    depends_on:
+      - springboot
+      - node
+    restart: on-failure
+  springboot:
+    build:
+      context: ./springboot
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
+    networks:
+      - app
+    depends_on:
+      - mysql
+    restart: on-failure
+  node:
+    build:
+      context: ./node
+      dockerfile: Dockerfile
+    ports:
+      - "8080:3000"
+    networks:
+      - app
+    depends_on:
+      - mysql
+    restart: on-failure
+  mysql:
+    image: "mysql:8.0"
+    environment:
+      MYSQL_ROOT_PASSWORD: password123_ABC
+      MYSQL_DATABASE: db_example
+      MYSQL_USER: khalid
+      MYSQL_PASSWORD: password123_ABC
+    command: --init-file /my-config
+    configs:
+      - source: my-config
+        target: /my-config
+    volumes:
+      - mysql-data:/var/lib/mysql
+    # healthcheck:
+    #   test:
+    #     [
+    #       "CMD-SHELL",
+    #       "mysqladmin ping -h localhost -u root -p$MYSQL_ROOT_PASSWORD || exit 1",
+    #     ]
+    #   interval: 1s
+    #   retries: 3
+    #   start_period: 25s
+    networks:
+      - app
+
+volumes:
+  mysql-data:
+configs:
+  my-config:
+    file: ./node/my-config
+  default.conf:
+    file: ./nginx/default.conf
+networks:
+  app:
+    name: app

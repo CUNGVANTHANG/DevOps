@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  cvt-mysql:
+    image: "mysql:8.0"
+    environment:
+      MYSQL_ROOT_PASSWORD: password123
+      MYSQL_DATABASE: db_example
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  cvt-app:
+    image: "wordpress:latest"
+    env-file: .env-app
+    ports:
+      - "8080:80"
+    volumes:
+      - app-data:/var/www/html
+    depends_on:
+      - cvt-mysql
+
+volumes:
+  mysql-data:
+  app-data:
