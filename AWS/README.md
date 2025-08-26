@@ -1,5 +1,10 @@
 # AWS
 
+- AWS viết tắt của Amazon Web Services
+- AWS nhà cung cấp Public Cloud hàng đầu thế giới
+- AWS cung cấp máy chủ (Server) và các dịch vụ mà không tốn chí phí đầu tư ban đầu, dễ dàng co giãn và linh hoạt 
+
+
 ## 1. Cài đặt budget
 
 Cài đặt budget giúp cho việc, nếu ta dùng các services của AWS quá nhiều khiến khoản phí tăng lên, mà ta không tắt dùng mấy dịch vụ đó thì sẽ rất tốn tiền. Vậy cần set up mỗi khi khoản phí của 1 service nào quá chỉ tiêu do ta đặt ra thì sẽ thông báo cho chúng ta qua email. Giúp kịp thời tắt dùng mấy dịch vụ đó
